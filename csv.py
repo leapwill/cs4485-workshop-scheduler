@@ -1,3 +1,2 @@
-
-def import_csv(filename: str):
+def import_csv(filename = "fname"):
     print('import_csv')
