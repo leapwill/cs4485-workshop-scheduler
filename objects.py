@@ -1,4 +1,3 @@
-
 class MusicClass(object):
     pass
 
