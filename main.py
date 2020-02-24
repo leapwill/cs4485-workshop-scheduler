@@ -19,6 +19,8 @@ async def main():
     server = await loop.create_server(lambda: HTTP_Protocol(),
         hostname, port, start_serving = False)
 
+    # Begin accepting connections
+    # `async with` block automatically handles cleanup on close
     async with server:
         await server.serve_forever();
 
