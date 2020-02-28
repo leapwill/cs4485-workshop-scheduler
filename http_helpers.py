@@ -94,7 +94,8 @@ class HTTP_Handler (BaseHTTPRequestHandler):
             self.add_payload(
                 (
                     b'<html>\r\n'
-                    b'404 Not Found\r\n'
+                    b'404 Not Found <br/>\r\n'
+                    + f'{self.parse_result.path}\r\n'.encode() +
                     b'</html>\r\n'
                 ),
                 ('text/html', None)
