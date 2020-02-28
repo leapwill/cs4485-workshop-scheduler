@@ -1,5 +1,7 @@
 from http.server import BaseHTTPRequestHandler
 from io import BytesIO
+from mimetypes import guess_type
+from urllib.parse import unquote_plus, urlparse
 import asyncio as aio
 
 # Nasty little hack to let the stdlib parse the request
@@ -8,16 +10,20 @@ class HTTP_Handler (BaseHTTPRequestHandler):
     # Necessary because the Server in asyncio accepts a Protocol factory
     # in the constructor which is separate from the request handlers
     # used in the https.server module.
-    def __init__ (self, request, transport):
+    def __init__ (self, request, transport, webapp_root):
         self.transport = transport
         self.rfile = BytesIO(request)
         self.response = ''
         self.payload = None
+        self.webapp_root = webapp_root
 
         self.raw_requestline = self.rfile.readline()
         self.error_code = None
         self.error_message = None
         self.parse_request()
+
+        unquoted = unquote_plus(self.path)
+        self.parse_result = urlparse(unquoted, allow_fragments = True)
 
     # Set error variables, but don't actually send anything
     # (theres no client connection to write to)
@@ -43,10 +49,12 @@ class HTTP_Handler (BaseHTTPRequestHandler):
             '\r\n'
         );
 
-    # Sets the payload and adds Content-Type and Content-Length headers
+    # Sets the payload and adds Content-Type, -Encoding, and -Length headers
     def add_payload (self, payload, type_):
         self.payload = bytes(payload)
-        self.add_header('Content-Type', type_)
+        self.add_header('Content-Type', type_[0])
+        if type_[1] is not None:
+            self.add_header('Content-Encoding', type_[1])
         self.add_header('Content-Length', len(self.payload))
 
     # Sends the response
@@ -62,17 +70,41 @@ class HTTP_Handler (BaseHTTPRequestHandler):
 
     # Handle incoming GET requests
     def do_GET (self):
-        # Text to display
-        payload = (
-            f'<html>\r\n'
-            f'Request type: {self.command}\r\n'
-            f'</html>\r\n'
-        )
+        payload = None
+        pl_type = None
 
-        # Builds and sends the response
-        self.add_response_line(200)
-        self.add_payload(payload.encode(), 'text/html')
-        self.send_response()
+        # Open the file from the request or send a 404
+        try:
+            pl_file = None
+            if self.parse_result.path == '/':
+                pl_file = open(self.webapp_root + '/index.html', mode = 'rb')
+            else:
+                pl_file = open(
+                    self.webapp_root + self.parse_result.path,
+                    mode = 'rb'
+                )
+
+            # Guess the MIME type
+            pl_type = guess_type(pl_file.name)
+            payload = pl_file.read()
+            pl_file.close()
+        except OSError as o:
+            # 404 Error
+            self.add_response_line(404)
+            self.add_payload(
+                (
+                    b'<html>\r\n'
+                    b'404 Not Found\r\n'
+                    b'</html>\r\n'
+                ),
+                ('text/html', None)
+            )
+            self.send_response()
+        else:
+            # Builds and sends the response
+            self.add_response_line(200)
+            self.add_payload(payload, pl_type)
+            self.send_response()
 
     # Handle incoming POST requests
     def do_POST (self):
@@ -92,6 +124,10 @@ class HTTP_Handler (BaseHTTPRequestHandler):
 
 # Bridge between the HTTP_Handler class and the asyncio Server system
 class HTTP_Protocol (aio.Protocol):
+    # Pass the root directory of the webapp to the rest of the system
+    def __init__ (self, webapp_root):
+        self.webapp_root = webapp_root
+
     # Run every time a connection is made
     def connection_made (self, transport):
         self.transport = transport
@@ -100,7 +136,7 @@ class HTTP_Protocol (aio.Protocol):
 
     # Run whenever the server recieves a request
     def data_received (self, data):
-        handler = HTTP_Handler(data, self.transport)
+        handler = HTTP_Handler(data, self.transport, self.webapp_root)
         if handler.error_code == None:
             handler.handle_one_request()
         else:

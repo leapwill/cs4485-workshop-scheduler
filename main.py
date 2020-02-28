@@ -13,10 +13,11 @@ if sys.version_info < (3, 7):
 
 async def main():
     # Create the backend server object using a custom HTTP handler
-    hostname = "127.0.0.1"
+    hostname = '127.0.0.1'
     port = 80
     loop = aio.get_running_loop()
-    server = await loop.create_server(lambda: HTTP_Protocol(),
+    webapp_root = './webapp/'
+    server = await loop.create_server(lambda: HTTP_Protocol(webapp_root),
         hostname, port, start_serving = False)
 
     # Begin accepting connections
@@ -24,6 +25,6 @@ async def main():
     async with server:
         await server.serve_forever();
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     if sys.version_info >= (3, 7):
         aio.run(main())
