@@ -22,8 +22,14 @@ async def main():
 
     # Begin accepting connections
     # `async with` block automatically handles cleanup on close
-    async with server:
-        await server.serve_forever();
+    # async with server:
+    #     await server.serve_forever();
+
+    # Array of csv data
+    data = csv.import_csv("example.csv")
+
+    for d in data:
+        print(d)
 
 if __name__ == '__main__':
     if sys.version_info >= (3, 7):
