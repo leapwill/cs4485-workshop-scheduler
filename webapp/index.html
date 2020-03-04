@@ -8,6 +8,10 @@
 </head>
 <body>
     <div id="app">
+        <button v-on:click="goHome">Home</button>
+        <button v-on:click="selectConstraints">Constraints</button>
+        <button v-on:click="selectSchedule">Schedule</button>
+        
         <div v-if="app1Visable">
             {{ message }}
             <br>

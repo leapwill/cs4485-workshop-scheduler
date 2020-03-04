@@ -7,12 +7,19 @@ let app = new Vue({
     methods: {
         selectConstraints: function(){
             constraintComponent.constraintsVisable = true;
+            scheduleComponent.scheduleVisable = false;
             app.app1Visable = false;
         },
         selectSchedule: function(){
             scheduleComponent.scheduleVisable = true;
+            constraintComponent.constraintsVisable = false;
             app.app1Visable = false;
         },
+        goHome: function(){
+            scheduleComponent.scheduleVisable = false;
+            constraintComponent.constraintsVisable = false;
+            app.app1Visable = true;
+        }
     }
 })
 
