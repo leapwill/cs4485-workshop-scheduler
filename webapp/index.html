@@ -21,7 +21,14 @@
         </div>
     </div>
     <div id="constraints">
-        <div v-if="constraintsVisable">Constraints are Visable</div>
+        <div v-if="constraintsVisable">
+            Constraints are Visable
+            <constraintItem
+                v-for="item in constraints"
+                v-bind:constraint="item"
+                v-bind:key="item.id"
+            ></constraintItem>
+        </div>
     </div>
     <div id='schedule'>
         <div v-if="scheduleVisable">Schedule is Visable</div>

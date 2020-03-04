@@ -16,10 +16,23 @@ let app = new Vue({
     }
 })
 
+Vue.component('constraintitem', {
+    props: ['constraint'],
+    template: 
+    `<div>{{constraint.type}} : {{constraint.value}}</div>`
+})
+
 let constraintComponent = new Vue({
     el: '#constraints',
     data: {
-        constraintsVisable: false
+        constraintsVisable: false,
+        //eventually the constraints will all be built and returned by reading
+        //the list file
+        constraints: [
+            {id: 0, type:'times', value:'10-2'},
+            {id: 1, type:'teachers', value:'Will'},
+            {id: 2, type:'unique students', value: ['James','Michael']}
+        ]
     }
 })
 
