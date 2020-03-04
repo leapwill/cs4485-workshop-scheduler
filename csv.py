@@ -79,31 +79,27 @@ class CSVData:
             f'\tDalcroze: {self.dal}'
         )
 
-def import_csv(filename = "fname"):
-    try:
-        ret = []
-        with open(filename) as csv:
-            # Skip the first line which is just the fields
-            next(csv)
-            # Go through the CSV file line by line
-            for line in csv:
-                # Replace "yes" strings with T
-                line = re.sub('"yes,.*?"', 'T', line, flags=re.IGNORECASE)
-                # Replace "no" strings with F
-                line = re.sub('"no,.*?"', 'F', line, flags=re.IGNORECASE)
-                # Split into individual bits
-                spl = line.split(',')
-                # Convert into numbers
-                spl = [int(x) if x.isdigit() else x for x in spl]
-                # Convert True/False
-                spl = [True if x == 'T'
-                    else False if x == 'F'
-                    else x
-                    for x in spl]
-                # Convert empty string
-                spl = [None if x == '' else x for x in spl]
-                ret.append(CSVData(*spl))
+def import_csv(csv):
+    ret = []
+    # Skip the first line which is just the fields
+    next(csv)
+    # Go through the CSV file line by line
+    for line in csv:
+        # Replace "yes" strings with T
+        line = re.sub('"yes,.*?"', 'T', line, flags=re.IGNORECASE)
+        # Replace "no" strings with F
+        line = re.sub('"no,.*?"', 'F', line, flags=re.IGNORECASE)
+        # Split into individual bits
+        spl = line.split(',')
+        # Convert into numbers
+        spl = [int(x) if x.isdigit() else x for x in spl]
+        # Convert True/False
+        spl = [True if x == 'T'
+            else False if x == 'F'
+            else x
+            for x in spl]
+        # Convert empty string
+        spl = [None if x == '' else x for x in spl]
+        ret.append(CSVData(*spl))
 
-        return ret
-    except OSError:
-        return None
+    return ret

@@ -1,8 +1,10 @@
+from base64 import standard_b64decode
 from http.server import BaseHTTPRequestHandler
-from io import BytesIO
+from io import BytesIO, StringIO
 from mimetypes import guess_type
 from urllib.parse import unquote_plus, urlparse
 import asyncio as aio
+import csv
 
 # Nasty little hack to let the stdlib parse the request
 class HTTP_Handler (BaseHTTPRequestHandler):
@@ -27,7 +29,7 @@ class HTTP_Handler (BaseHTTPRequestHandler):
 
     # Set error variables, but don't actually send anything
     # (theres no client connection to write to)
-    def send_error (self, error_code, error_msg):
+    def send_error (self, error_code, error_msg, explain):
         self.error_code = error_code
         self.error_message = error_msg
 
@@ -47,7 +49,7 @@ class HTTP_Handler (BaseHTTPRequestHandler):
             f'{name}:'
             f' {value}'
             '\r\n'
-        );
+        )
 
     # Sets the payload and adds Content-Type, -Encoding, and -Length headers
     def add_payload (self, payload, type_):
@@ -59,8 +61,12 @@ class HTTP_Handler (BaseHTTPRequestHandler):
 
     # Sends the response
     # Automatically adds the required blank line between headers and data
+    # If no payload data, add Content-Length 0 header
     # Reset the response and payload variables
     def send_response (self):
+        if self.payload == None:
+            self.add_header('Content-Length', 0)
+
         response = bytes(self.response.encode() + b'\r\n'
             + (self.payload if self.payload != None else bytes()))
         self.transport.write(response)
@@ -109,7 +115,38 @@ class HTTP_Handler (BaseHTTPRequestHandler):
 
     # Handle incoming POST requests
     def do_POST (self):
-        pass
+        payload = None
+        pl_type = None
+
+        # CSV data passed in:
+        #   Content-Type: text/csv
+        #   Content-Encoding: base64
+        #   Content-Length: [length of encoded data]
+        if self.parse_result.path == '/post_csv':
+            length = self.headers['content-length']
+            post_data = self.rfile.read(int(length))
+            post_str = standard_b64decode(post_data).decode()
+            csv_entries = csv.import_csv(StringIO(post_str))
+            # Print contents to stdout (for now)
+            for c in csv_entries:
+                print(c)
+
+            # Send 200 OK
+            self.add_response_line(200)
+            self.send_response()
+        # Invalid target, 400 error
+        else:
+            self.add_response_line(400)
+            self.add_payload(
+                (
+                    b'<html>\r\n'
+                    b'400 Bad Request <br/>\r\n'
+                    + f'Target: {self.parse_result.path}\r\n'.encode() +
+                    b'</html>\r\n'
+                ),
+                ('text/html', None)
+            )
+            self.send_response()
 
     # Handles unknown request types
     def do_UNK (self):
@@ -120,6 +157,8 @@ class HTTP_Handler (BaseHTTPRequestHandler):
     def handle_one_request (self):
         if self.command == 'GET':
             self.do_GET()
+        elif self.command == 'POST':
+            self.do_POST()
         else:
             self.do_UNK()
 
@@ -128,6 +167,7 @@ class HTTP_Protocol (aio.Protocol):
     # Pass the root directory of the webapp to the rest of the system
     def __init__ (self, webapp_root):
         self.webapp_root = webapp_root
+        self.data = bytes()
 
     # Run every time a connection is made
     def connection_made (self, transport):
@@ -135,15 +175,18 @@ class HTTP_Protocol (aio.Protocol):
         self.peername = transport.get_extra_info('peername')
         print(f'Connection from: {self.peername}')
 
-    # Run whenever the server recieves a request
+    # Run whenever the server recieves data
     def data_received (self, data):
-        handler = HTTP_Handler(data, self.transport, self.webapp_root)
-        if handler.error_code == None:
-            handler.handle_one_request()
-        else:
-            print(f'Error code: {hadler.error_code} {handler.error_message}')
+        self.data = self.data + bytes(data)
 
     # Run once when the client closes the connection
     def eof_received (self):
-        self.transport.close()
-        print(f'Closed connection with: {self.peername}')
+        handler = HTTP_Handler(self.data, self.transport, self.webapp_root)
+        if handler.error_code == None:
+            handler.handle_one_request()
+            self.transport.close()
+            print(f'Closed connection with: {self.peername}')
+        else:
+            print(f'Error code: {hadler.error_code} {handler.error_message}')
+            self.transport.close()
+            print(f'Closed connection with: {self.peername}')

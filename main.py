@@ -1,11 +1,8 @@
 #!/usr/bin/env python3
 
-from objects import MusicClass, ElectiveClass
 from http_helpers import HTTP_Protocol
 import asyncio as aio
 import sys
-
-import csv
 
 if sys.version_info < (3, 7):
     print('Please update to Python 3.7 or newer.')
@@ -22,14 +19,8 @@ async def main():
 
     # Begin accepting connections
     # `async with` block automatically handles cleanup on close
-    # async with server:
-    #     await server.serve_forever();
-
-    # Array of csv data
-    data = csv.import_csv("example.csv")
-
-    for d in data:
-        print(d)
+    async with server:
+        await server.serve_forever();
 
 if __name__ == '__main__':
     if sys.version_info >= (3, 7):
