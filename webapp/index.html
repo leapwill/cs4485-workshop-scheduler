@@ -8,7 +8,23 @@
 </head>
 <body>
     <div id="app">
-        {{ message }}
+        <div v-if="app1Visable">
+            {{ message }}
+            <br>
+            <button v-on:click="selectConstraints">
+                Go to constraints page
+            </button>
+            <br>
+            <button v-on:click="selectSchedule">
+                Go to schedule page
+            </button>
+        </div>
+    </div>
+    <div id="constraints">
+        <div v-if="constraintsVisable">Constraints are Visable</div>
+    </div>
+    <div id='schedule'>
+        <div v-if="scheduleVisable">Schedule is Visable</div>
     </div>
     <script src="app.js"></script>
 </body>
