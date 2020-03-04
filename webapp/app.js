@@ -2,24 +2,17 @@ let app = new Vue({
     el: '#app',
     data: {
         message: "Hello World!",
-        app1Visable:true
+        app1Visible:true
     },
     methods: {
         selectConstraints: function(){
-            constraintComponent.constraintsVisable = true;
-            scheduleComponent.scheduleVisable = false;
-            app.app1Visable = false;
+            constraintComponent.constraintsVisible = true;
+            app.app1Visible = false;
         },
         selectSchedule: function(){
-            scheduleComponent.scheduleVisable = true;
-            constraintComponent.constraintsVisable = false;
-            app.app1Visable = false;
+            scheduleComponent.scheduleVisible = true;
+            app.app1Visible = false;
         },
-        goHome: function(){
-            scheduleComponent.scheduleVisable = false;
-            constraintComponent.constraintsVisable = false;
-            app.app1Visable = true;
-        }
     }
 })
 
@@ -32,7 +25,7 @@ Vue.component('constraintitem', {
 let constraintComponent = new Vue({
     el: '#constraints',
     data: {
-        constraintsVisable: false,
+        constraintsVisible: false,
         //eventually the constraints will all be built and returned by reading
         //the list file
         constraints: [
@@ -46,7 +39,7 @@ let constraintComponent = new Vue({
 let scheduleComponent = new Vue({
     el: '#schedule',
     data: {
-        scheduleVisable: false
+        scheduleVisible: false
     }
 })
 

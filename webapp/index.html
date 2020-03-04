@@ -8,11 +8,7 @@
 </head>
 <body>
     <div id="app">
-        <button v-on:click="goHome">Home</button>
-        <button v-on:click="selectConstraints">Constraints</button>
-        <button v-on:click="selectSchedule">Schedule</button>
-        
-        <div v-if="app1Visable">
+        <div v-if="app1Visible">
             {{ message }}
             <br>
             <button v-on:click="selectConstraints">
@@ -25,8 +21,8 @@
         </div>
     </div>
     <div id="constraints">
-        <div v-if="constraintsVisable">
-            Constraints are Visable
+        <div v-if="constraintsVisible">
+            Constraints are Visible
             <constraintItem
                 v-for="item in constraints"
                 v-bind:constraint="item"
@@ -35,7 +31,7 @@
         </div>
     </div>
     <div id='schedule'>
-        <div v-if="scheduleVisable">Schedule is Visable</div>
+        <div v-if="scheduleVisible">Schedule is Visible</div>
     </div>
     <script src="app.js"></script>
 </body>
