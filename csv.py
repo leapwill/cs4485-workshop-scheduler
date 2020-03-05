@@ -79,6 +79,7 @@ class CSVData:
             f'\tDalcroze: {self.dal}'
         )
 
+# Import the data from a CVS file given as a text-mode file-like object
 def import_csv(csv):
     ret = []
     # Skip the first line which is just the fields

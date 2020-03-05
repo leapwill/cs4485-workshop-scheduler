@@ -12,8 +12,8 @@ async def main():
     # Create the backend server object using a custom HTTP handler
     hostname = '127.0.0.1'
     port = 80
-    loop = aio.get_running_loop()
     webapp_root = './webapp/'
+    loop = aio.get_running_loop()
     server = await loop.create_server(lambda: HTTP_Protocol(webapp_root),
         hostname, port, start_serving = False)
 

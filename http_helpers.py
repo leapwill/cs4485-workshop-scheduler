@@ -1,17 +1,18 @@
+from asyncio import Protocol
 from base64 import standard_b64decode
 from http.server import BaseHTTPRequestHandler
 from io import BytesIO, StringIO
 from mimetypes import guess_type
 from urllib.parse import unquote_plus, urlparse
-import asyncio as aio
-import csv
+
+from csv import import_csv
 
 # Nasty little hack to let the stdlib parse the request
 class HTTP_Handler (BaseHTTPRequestHandler):
     # Manually build the handler around a bytes object and a transport.
     # Necessary because the Server in asyncio accepts a Protocol factory
     # in the constructor which is separate from the request handlers
-    # used in the https.server module.
+    # used in the http.server module.
     def __init__ (self, request, transport, webapp_root):
         self.transport = transport
         self.rfile = BytesIO(request)
@@ -59,9 +60,22 @@ class HTTP_Handler (BaseHTTPRequestHandler):
     def add_payload (self, payload, type_):
         self.payload = bytes(payload)
         self.add_header('Content-Type', type_[0])
-        if type_[1] is not None:
+        if type_[1] != None:
             self.add_header('Content-Encoding', type_[1])
         self.add_header('Content-Length', len(self.payload))
+
+    # Builds a basic HTML response
+    def generate_html_response (self, error, msg):
+        self.add_response_line(error)
+        self.add_payload(
+            (
+                f'<html>\n'
+                f'{error} {self.responses[error][0]}<br/>\n'
+                f'{msg}\n'
+                f'</html>\n'
+            ).encode(),
+            ('text/html', None)
+        )
 
     # Sends the response
     # Automatically adds the required blank line between headers and data
@@ -74,8 +88,10 @@ class HTTP_Handler (BaseHTTPRequestHandler):
 
         self.add_header('Connection', 'close')
 
-        response = bytes(self.response.encode() + b'\r\n'
-            + (self.payload if self.payload != None else bytes()))
+        response = (
+            f'{self.response}\r\n'.encode()
+            + (self.payload if self.payload else b'')
+        )
         self.transport.write(response)
 
         self.response = ''
@@ -103,16 +119,7 @@ class HTTP_Handler (BaseHTTPRequestHandler):
             pl_file.close()
         except OSError as o:
             # 404 Error
-            self.add_response_line(404)
-            self.add_payload(
-                (
-                    b'<html>\r\n'
-                    b'404 Not Found <br/>\r\n'
-                    + f'{self.parse_result.path}\r\n'.encode() +
-                    b'</html>\r\n'
-                ),
-                ('text/html', None)
-            )
+            self.generate_html_response(404, self.parse_result.path)
             self.send_response()
         else:
             # Builds and sends the response
@@ -133,31 +140,30 @@ class HTTP_Handler (BaseHTTPRequestHandler):
             length = self.headers['content-length']
             post_data = self.rfile.read(int(length))
             post_str = standard_b64decode(post_data).decode()
-            csv_entries = csv.import_csv(StringIO(post_str))
+            csv_entries = import_csv(StringIO(post_str))
             # Print contents to stdout (for now)
             for c in csv_entries:
                 print(c)
 
-            # Send 200 OK
-            self.add_response_line(200)
+            # Provisionally send 204 No Content
+            self.add_response_line(204)
             self.send_response()
-        # Invalid target, 400 error
+        # Invalid target, send 400 Bad Request
         else:
-            self.add_response_line(400)
-            self.add_payload(
-                (
-                    b'<html>\r\n'
-                    b'400 Bad Request <br/>\r\n'
-                    + f'Target: {self.parse_result.path}\r\n'.encode() +
-                    b'</html>\r\n'
-                ),
-                ('text/html', None)
+            self.generate_html_response(
+                400,
+                f'Invalid target: {self.parse_result.path}'
             )
             self.send_response()
 
     # Handles unknown request types
+    # Sends a 501 Not Implemented
     def do_UNK (self):
-        pass
+        self.generate_html_response(
+            501,
+            f'Unsupported method: {self.command}'
+        )
+        self.send_response()
 
     # Override the method from BaseHTTPRequestHandler because the way the
     # request is passed in and dealt with is different
@@ -170,7 +176,7 @@ class HTTP_Handler (BaseHTTPRequestHandler):
             self.do_UNK()
 
 # Bridge between the HTTP_Handler class and the asyncio Server system
-class HTTP_Protocol (aio.Protocol):
+class HTTP_Protocol (Protocol):
     # Pass the root directory of the webapp to the rest of the system
     def __init__ (self, webapp_root):
         self.webapp_root = webapp_root
@@ -188,12 +194,12 @@ class HTTP_Protocol (aio.Protocol):
     def data_received (self, data):
         # Append the data recieved
         self.data += bytes(data)
-        self.body_start = self.data.find(b'\r\n\r\n') + 4
+        body_start = self.data.find(b'\r\n\r\n') + 4
         total = 0
 
         # Set up handler once all the headers have been recieved
         # find() returns -1 if not found, +4 for the entire 4 byte delimiter
-        if self.handler == None and self.body_start > 3:
+        if self.handler == None and body_start > 3:
             self.handler = HTTP_Handler(self.data, self.transport,
                 self.webapp_root)
             # Close connection if handler setup fails
@@ -208,27 +214,12 @@ class HTTP_Protocol (aio.Protocol):
             # body_start is the length of the request line + headers
             # Content-Length gives the body length
             cont_len = self.handler.headers['content-length']
-            total = self.body_start + (int(cont_len) if cont_len else 0)
+            total = body_start + (int(cont_len) if cont_len else 0)
 
         # Handle the request once the entire body is recieved
         if self.handler and len(self.data) >= total:
-            self.handler.update_data(self.data, self.body_start)
+            self.handler.update_data(self.data, body_start)
             self.handler.handle_one_request()
-
-    # Run once when the client sends an EOF or similar
-    # def eof_received (self):
-    #     # if self.handler == None:
-    #     #     self.handler = HTTP_Handler(self.data, self.transport,
-    #     #         self.webapp_root)
-    #     if self.handler.error_code == None:
-    #         self.handler.handle_one_request()
-    #     else:
-    #         print(
-    #             f'Error code: {self.hadler.error_code}'
-    #             f' {self.handler.error_message}'
-    #         )
-    #         self.transport.close()
-    #         print(f'Closed connection with: {self.peername}')
 
     # Run once when the connection is lost or closed
     def connection_lost (self, exc):
