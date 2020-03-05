@@ -52,16 +52,27 @@ button, a, *[click] {
 button {
     padding: 12px 20px;
     box-shadow: none;
-    background-color: #ffffff;
-    border: 1px solid #333;
+    background-color: #333333;
+    border: 1px solid #333333;
     border-radius: 1px;
     font-family: 'Josefin Sans', sans-serif;
-    color: #333;
+    color: #fff;
     text-transform: uppercase;
     transition: all 250ms ease-in;
 }
 
+button.btn-inverted {
+    background-color: #ffffff;
+    color: #333;
+}
+
 button:hover {
+    border-color: #1a1a1a;
+    background-color: #1a1a1a;
+    color: #fff;
+}
+
+button.btn-inverted:hover {
     border-color: #4d4d4d;
     background-color: #4d4d4d;
     color: #fff;
