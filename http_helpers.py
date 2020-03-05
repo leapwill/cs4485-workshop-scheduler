@@ -97,8 +97,8 @@ class HTTP_Handler (BaseHTTPRequestHandler):
         self.response = ''
         self.payload = None
 
-    # Handle incoming GET requests
-    def do_GET (self):
+    # Handle incoming GET and HEAD requests, default is GET
+    def do_GET (self, is_HEAD=False):
         payload = None
         pl_type = None
 
@@ -120,11 +120,17 @@ class HTTP_Handler (BaseHTTPRequestHandler):
         except OSError as o:
             # 404 Error
             self.generate_html_response(404, self.parse_result.path)
+            # Remove payload if HEAD request
+            if is_HEAD:
+                self.payload = b''
             self.send_response()
         else:
             # Builds and sends the response
             self.add_response_line(200)
             self.add_payload(payload, pl_type)
+            # Remove payload if HEAD request
+            if is_HEAD:
+                self.payload = b''
             self.send_response()
 
     # Handle incoming POST requests
@@ -170,6 +176,8 @@ class HTTP_Handler (BaseHTTPRequestHandler):
     def handle_one_request (self):
         if self.command == 'GET':
             self.do_GET()
+        elif self.command == 'HEAD':
+            self.do_GET(is_HEAD = True)
         elif self.command == 'POST':
             self.do_POST()
         else:
