@@ -27,6 +27,10 @@ class HTTP_Handler (BaseHTTPRequestHandler):
         unquoted = unquote_plus(self.path)
         self.parse_result = urlparse(unquoted, allow_fragments = True)
 
+    # Update the handler's data to have all the body
+    def update_data (self, data, index):
+        self.rfile = BytesIO(data[index:])
+
     # Set error variables, but don't actually send anything
     # (theres no client connection to write to)
     def send_error (self, error_code, error_msg, explain):
@@ -61,11 +65,14 @@ class HTTP_Handler (BaseHTTPRequestHandler):
 
     # Sends the response
     # Automatically adds the required blank line between headers and data
-    # If no payload data, add Content-Length 0 header
+    # If no payload data, add 'Content-Length: 0' header
+    # Also add the 'Connection: close' to tell client the socket will close
     # Reset the response and payload variables
     def send_response (self):
         if self.payload == None:
             self.add_header('Content-Length', 0)
+
+        self.add_header('Connection', 'close')
 
         response = bytes(self.response.encode() + b'\r\n'
             + (self.payload if self.payload != None else bytes()))
@@ -168,6 +175,7 @@ class HTTP_Protocol (aio.Protocol):
     def __init__ (self, webapp_root):
         self.webapp_root = webapp_root
         self.data = bytes()
+        self.handler = None
 
     # Run every time a connection is made
     def connection_made (self, transport):
@@ -176,17 +184,53 @@ class HTTP_Protocol (aio.Protocol):
         print(f'Connection from: {self.peername}')
 
     # Run whenever the server recieves data
+    # Waits for all data to be recieved before continuing
     def data_received (self, data):
-        self.data = self.data + bytes(data)
+        # Append the data recieved
+        self.data += bytes(data)
+        self.body_start = self.data.find(b'\r\n\r\n') + 4
+        total = 0
 
-    # Run once when the client closes the connection
-    def eof_received (self):
-        handler = HTTP_Handler(self.data, self.transport, self.webapp_root)
-        if handler.error_code == None:
-            handler.handle_one_request()
-            self.transport.close()
-            print(f'Closed connection with: {self.peername}')
-        else:
-            print(f'Error code: {hadler.error_code} {handler.error_message}')
-            self.transport.close()
-            print(f'Closed connection with: {self.peername}')
+        # Set up handler once all the headers have been recieved
+        # find() returns -1 if not found, +4 for the entire 4 byte delimiter
+        if self.handler == None and self.body_start > 3:
+            self.handler = HTTP_Handler(self.data, self.transport,
+                self.webapp_root)
+            # Close connection if handler setup fails
+            if self.handler.error_code:
+                print(
+                    f'Error code: {self.hadler.error_code}'
+                    f' {self.handler.error_message}'
+                )
+                self.transport.close()
+                print(f'Closed connection with: {self.peername}')
+                return
+            # body_start is the length of the request line + headers
+            # Content-Length gives the body length
+            cont_len = self.handler.headers['content-length']
+            total = self.body_start + (int(cont_len) if cont_len else 0)
+
+        # Handle the request once the entire body is recieved
+        if self.handler and len(self.data) >= total:
+            self.handler.update_data(self.data, self.body_start)
+            self.handler.handle_one_request()
+
+    # Run once when the client sends an EOF or similar
+    # def eof_received (self):
+    #     # if self.handler == None:
+    #     #     self.handler = HTTP_Handler(self.data, self.transport,
+    #     #         self.webapp_root)
+    #     if self.handler.error_code == None:
+    #         self.handler.handle_one_request()
+    #     else:
+    #         print(
+    #             f'Error code: {self.hadler.error_code}'
+    #             f' {self.handler.error_message}'
+    #         )
+    #         self.transport.close()
+    #         print(f'Closed connection with: {self.peername}')
+
+    # Run once when the connection is lost or closed
+    def connection_lost (self, exc):
+        self.transport.close()
+        print(f'Closed connection with: {self.peername}')
