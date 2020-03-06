@@ -127,10 +127,14 @@ class HTTP_Handler (BaseHTTPRequestHandler):
             self.send_response()
         else:
             # Builds and sends the response
-            # For implicit index, send 303 See Other
+            # For implicit index, send 303 See Other if >=HTTP/1.1
+            # Send 302 Found <HTTP/1.1
             # Add the Location header
             if implicit_index:
-                self.add_response_line(303)
+                if float(self.request_version.split('/')[1]) >= 1.1:
+                    self.add_response_line(303)
+                else:
+                    self.add_response_line(302)
                 self.add_header('Location', '/index.html')
             else:
                 self.add_response_line(200)
