@@ -101,22 +101,23 @@ class HTTP_Handler (BaseHTTPRequestHandler):
     def do_GET (self, is_HEAD=False):
         payload = None
         pl_type = None
+        implicit_index = False
 
-        # Open the file from the request or send a 404
+        # Open the file from the request, send a 303 or send a 404
         try:
             pl_file = None
             if self.parse_result.path == '/':
-                pl_file = open(self.webapp_root + '/index.html', mode = 'rb')
+                implicit_index = True
             else:
                 pl_file = open(
                     self.webapp_root + self.parse_result.path,
                     mode = 'rb'
                 )
 
-            # Guess the MIME type
-            pl_type = guess_type(pl_file.name)
-            payload = pl_file.read()
-            pl_file.close()
+                # Guess the MIME type
+                pl_type = guess_type(pl_file.name)
+                payload = pl_file.read()
+                pl_file.close()
         except OSError as o:
             # 404 Error
             self.generate_html_response(404, self.parse_result.path)
@@ -126,8 +127,14 @@ class HTTP_Handler (BaseHTTPRequestHandler):
             self.send_response()
         else:
             # Builds and sends the response
-            self.add_response_line(200)
-            self.add_payload(payload, pl_type)
+            # For implicit index, send 303 See Other
+            # Add the Location header
+            if implicit_index:
+                self.add_response_line(303)
+                self.add_header('Location', '/index.html')
+            else:
+                self.add_response_line(200)
+                self.add_payload(payload, pl_type)
             # Remove payload if HEAD request
             if is_HEAD:
                 self.payload = b''
@@ -143,6 +150,36 @@ class HTTP_Handler (BaseHTTPRequestHandler):
         #   Content-Encoding: base64
         #   Content-Length: [length of encoded data]
         if self.parse_result.path == '/post_csv':
+            # Test for Content-Length header
+            # If missing, send 411 Length Required
+            if self.headers['content-length'] == None:
+                self.generate_html_response(
+                    411,
+                    'Content-Length required'
+                )
+                self.send_response()
+                return
+
+            # Test for text/csv type
+            # If incorrect, send 415 Unsupported Media
+            if self.headers['content-type'] != 'text/csv':
+                self.generate_html_response(
+                    415,
+                    f'Unsuported type: {self.headers["content-type"]}'
+                )
+                self.send_response()
+                return
+
+            # Test for base64 encoding
+            # If incorrect encoding, send 422 Unprocessable Entity
+            if self.headers['content-encoding'] != 'base64':
+                self.generate_html_response(
+                    422,
+                    f'Unsuported encoding: {self.headers["content-encoding"]}'
+                )
+                self.send_response()
+                return
+
             length = self.headers['content-length']
             post_data = self.rfile.read(int(length))
             post_str = standard_b64decode(post_data).decode()
@@ -163,17 +200,29 @@ class HTTP_Handler (BaseHTTPRequestHandler):
             self.send_response()
 
     # Handles unknown request types
-    # Sends a 501 Not Implemented
+    # Sends a 405 Method Not Allowed
     def do_UNK (self):
         self.generate_html_response(
-            501,
+            405,
             f'Unsupported method: {self.command}'
         )
+        self.add_header('Allow', 'GET, HEAD, POST')
         self.send_response()
 
     # Override the method from BaseHTTPRequestHandler because the way the
     # request is passed in and dealt with is different
     def handle_one_request (self):
+        # Test for Range header
+        # If found, send 501 Not Implemented
+        if self.headers['range']:
+            self.generate_html_response(
+                501,
+                'Byte serving not available'
+            )
+            self.send_response()
+            return
+
+        # Test the different methods
         if self.command == 'GET':
             self.do_GET()
         elif self.command == 'HEAD':
