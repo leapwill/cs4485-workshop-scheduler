@@ -2,14 +2,14 @@ let app = new Vue({
     el: '#app',
     data: {
         message: "Hello World!",
-        app1Visible:true
+        app1Visible: true
     },
     methods: {
-        selectConstraints: function(){
+        selectConstraints: function () {
             constraintComponent.constraintsVisible = true;
             app.app1Visible = false;
         },
-        selectSchedule: function(){
+        selectSchedule: function () {
             scheduleComponent.scheduleVisible = true;
             app.app1Visible = false;
         },
@@ -18,21 +18,32 @@ let app = new Vue({
 
 Vue.component('constraintitem', {
     props: ['constraint'],
-    template: 
-    `<div>{{constraint.type}} : {{constraint.value}}</div>`
+    template:
+        `<div>{{constraint.type}} : {{constraint.value}}</div>`
 })
 
 let constraintComponent = new Vue({
+    // TODO: fetch existing constraints from server and fill in
     el: '#constraints',
     data: {
         constraintsVisible: false,
         //eventually the constraints will all be built and returned by reading
         //the list file
         constraints: [
-            {id: 0, type:'times', value:'10-2'},
-            {id: 1, type:'teachers', value:'Will'},
-            {id: 2, type:'unique students', value: ['James','Michael']}
-        ]
+            { id: 0, type: 'times', value: '10-2' },
+            { id: 1, type: 'teachers', value: 'Will' },
+            { id: 2, type: 'unique students', value: ['James', 'Michael'] }
+        ],
+        constraints2: {
+            'instructors': [
+                { id: 1000, 'name': 'Ray Lewis', instruments: ['Violin', 'Viola'] },
+                { id: 1001, 'name': 'Catherine Adkins', instruments: ['Cello'] }
+            ],
+            'rooms': [
+                { id: 2000, 'number': 'NW 1204', capacity: 8 },
+                { id: 2001, 'number': 'NE 1010', capacity: 40 }
+            ]
+        }
     }
 })
 
@@ -48,8 +59,8 @@ let scheduleComponent = new Vue({
 NOTES
 
 okaaay... so that's the extremely simple stuff put together. At the moment,
-especially considering exactly what we're trying to build, I don't think a 
-single page-app is outside the realm of possibility. 
+especially considering exactly what we're trying to build, I don't think a
+single page-app is outside the realm of possibility.
 
 Considering using a v-for (vue directive runs on each thing in a collection) to
 render constraints in their own components. Will need to see how that works.

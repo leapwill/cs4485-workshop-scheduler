@@ -14,36 +14,50 @@
         SMID Summer Workshop Scheduler
     </header>
     <div id="content">
-        <div id="app">
-            <div v-if="app1Visible">
-                {{ message }}
-                <br>
-                <div class="panel flex">
-                    <button v-on:click="selectConstraints">
-                        Enter Constraints
-                    </button>
-                    <div>
-                        Create or change the data for a workshop
-                    </div>
+        <!-- Homepage -->
+        <div id="app" v-if="app1Visible">
+            {{ message }}
+            <br>
+            <div class="panel flex">
+                <button v-on:click="selectConstraints">
+                    Enter Constraints
+                </button>
+                <div>
+                    Create or change the data for a workshop
                 </div>
-                <br>
-                <div class="panel flex">
-                    <button v-on:click="selectSchedule">
-                        View Schedules
-                    </button>
-                    <div>
-                        Look at generated schedules for a workshop
-                    </div>
+            </div>
+            <br>
+            <div class="panel flex">
+                <button v-on:click="selectSchedule">
+                    View Schedules
+                </button>
+                <div>
+                    Look at generated schedules for a workshop
                 </div>
             </div>
         </div>
-        <div id="constraints">
-            <div v-if="constraintsVisible">
-                Constraints are Visible
-                <constraintItem v-for="item in constraints" v-bind:constraint="item" v-bind:key="item.id">
-                </constraintItem>
+        <!-- Constraints input page -->
+        <div id="constraints" v-if="constraintsVisible">
+            Constraints are Visible
+            <constraintItem v-for="item in constraints" v-bind:constraint="item" v-bind:key="item.id">
+            </constraintItem>
+            <!-- TODO: maybe make this page a <form> with <section>s for easier submitting to server -->
+            <div v-for="(cons, ctype) in constraints2" class="panel">
+                <div style="text-transform: capitalize;"><strong>{{ ctype }}</strong></div>
+                <div v-for="item in cons" style="border-bottom: 1px solid gray;">
+                    <!-- TODO: remove inline styles -->
+                    <div v-for="(v, k) in item">
+                        <!-- TODO use id="{{item.id}}_{{k}}" for Vue form stuff -->
+                        <div v-if="k === 'id'" style="display: none;">{{ v }}</div>
+                        <div v-else>{{ k }}: <input type="text" :value="v"></div>
+                        <!-- TODO: use other types of input for arrays -->
+                    </div>
+                    <!-- TODO: button to delete this row -->
+                </div>
+                <!-- TODO: button to add another row -->
             </div>
         </div>
+        <!-- Schedule results page -->
         <div id='schedule'>
             <div v-if="scheduleVisible">Schedule is Visible</div>
         </div>
