@@ -52,9 +52,16 @@ let constraintComponent = new Vue({
             const reader = new FileReader();
             const xhr = new XMLHttpRequest();
             const statusEl = document.querySelector('form#form-csv div.form-status');
-            xhr.upload.addEventListener('load', () => {
-                statusEl.classList.add('success');
-                statusEl.textContent = 'CSV upload succeeded';
+            xhr.addEventListener('load', () => {
+                if (xhr.status === 200) {
+                    statusEl.classList.add('success');
+                    statusEl.textContent = 'CSV upload succeeded';
+                }
+                else {
+                    statusEl.classList.add('error');
+                    statusEl.textContent = 'CSV upload failed: ' + xhr.statusText;
+                    console.error(xhr);
+                }
             });
             xhr.upload.addEventListener('error', (e) => {
                 statusEl.classList.add('error');
@@ -62,9 +69,11 @@ let constraintComponent = new Vue({
                 console.error(e);
             });
             xhr.open('POST', 'post_csv');
-            xhr.overrideMimeType('text/csv');
+            xhr.overrideMimeType('text/plain');
+            xhr.setRequestHeader('Content-Type', 'text/csv');
+            xhr.setRequestHeader('Content-Encoding', 'base64');
             reader.addEventListener('load', (e) => {
-                xhr.send(e.target.result);
+                xhr.send(btoa(e.target.result));
             });
             reader.readAsBinaryString(file);
         }
