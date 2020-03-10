@@ -13,6 +13,7 @@ body {
     background-color: var(--smid-white);
     color: var(--smid-text);
     font: 'Cardo', serif;
+    line-height: 1.5;
 }
 
 header {
@@ -30,7 +31,7 @@ h1, h2, h3, h4, h5, h6 {
     color: var(--smid-heading);
 }
 
-button, a, *[click] {
+button, a, *[click], input[type="submit"] {
     cursor: pointer;
 }
 
@@ -49,7 +50,7 @@ button, a, *[click] {
     align-items: center;
 }
 
-button {
+button, input[type="submit"] {
     padding: 12px 20px;
     box-shadow: none;
     background-color: #333333;
@@ -66,7 +67,7 @@ button.btn-inverted {
     color: #333;
 }
 
-button:hover {
+button:hover, input[type="submit"]:hover {
     border-color: #1a1a1a;
     background-color: #1a1a1a;
     color: #fff;
@@ -76,4 +77,18 @@ button.btn-inverted:hover {
     border-color: #4d4d4d;
     background-color: #4d4d4d;
     color: #fff;
+}
+
+#app > *, #constraints {
+    max-width: 10in;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.form-status.success {
+    border: 2px solid green;
+}
+
+.form-status.error {
+    border: 2px solid red;
 }

@@ -41,6 +41,15 @@
             Constraints are Visible
             <constraintItem v-for="item in constraints" v-bind:constraint="item" v-bind:key="item.id">
             </constraintItem>
+            <form v-on:submit="submitCsv" id="form-csv" class="panel">
+                <div><strong>Student Data CSV</strong></div>
+                <input type="file" accept=".csv">
+                <div style="color: red;">WARNING: This will reset the workshop data!</div>
+                <!-- TODO: figure out if this is true -->
+                <input type="submit" value="Upload">
+                <!-- TODO: loading spinner and success/failure message -->
+                <div class="form-status"></div>
+            </form>
             <!-- TODO: maybe make this page a <form> with <section>s for easier submitting to server -->
             <div v-for="(cons, ctype) in constraints2" class="panel">
                 <div style="text-transform: capitalize;"><strong>{{ ctype }}</strong></div>
@@ -48,7 +57,7 @@
                     <!-- TODO: remove inline styles -->
                     <div v-for="(v, k) in item">
                         <!-- TODO use id="{{item.id}}_{{k}}" for Vue form stuff -->
-                        <div v-if="k === 'id'" style="display: none;">{{ v }}</div>
+                        <div v-if="k === 'id'" style="display: none;"><input type="hidden" :value="v"></div>
                         <div v-else>{{ k }}: <input type="text" :value="v"></div>
                         <!-- TODO: use other types of input for arrays -->
                     </div>

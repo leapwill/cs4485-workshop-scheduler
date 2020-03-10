@@ -44,6 +44,30 @@ let constraintComponent = new Vue({
                 { id: 2001, 'number': 'NE 1010', capacity: 40 }
             ]
         }
+    },
+    methods: {
+        submitCsv: function (e) {
+            e.preventDefault();
+            const file = document.querySelector('form#form-csv input[type="file"]').files[0];
+            const reader = new FileReader();
+            const xhr = new XMLHttpRequest();
+            const statusEl = document.querySelector('form#form-csv div.form-status');
+            xhr.upload.addEventListener('load', () => {
+                statusEl.classList.add('success');
+                statusEl.textContent = 'CSV upload succeeded';
+            });
+            xhr.upload.addEventListener('error', (e) => {
+                statusEl.classList.add('error');
+                statusEl.textContent = 'CSV upload failed: ' + e.message;
+                console.error(e);
+            });
+            xhr.open('POST', 'post_csv');
+            xhr.overrideMimeType('text/csv');
+            reader.addEventListener('load', (e) => {
+                xhr.send(e.target.result);
+            });
+            reader.readAsBinaryString(file);
+        }
     }
 })
 
