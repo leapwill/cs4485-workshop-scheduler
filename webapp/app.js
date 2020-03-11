@@ -6,13 +6,34 @@ let app = new Vue({
     },
     methods: {
         selectConstraints: function () {
+            this.app1Visible = false;
             constraintComponent.constraintsVisible = true;
-            app.app1Visible = false;
+            window.location.hash = 'constraints';
         },
         selectSchedule: function () {
+            this.app1Visible = false;
             scheduleComponent.scheduleVisible = true;
-            app.app1Visible = false;
+            window.location.hash = 'schedule';
         },
+        restorePage: function () {
+            // Restore correct page on reload or browser back/forward
+            let hash = window.location.hash.substr(1);
+            if (hash === 'constraints') {
+                this.selectConstraints();
+            }
+            else if (hash === 'schedule') {
+                this.selectSchedule();
+            }
+            else {
+                constraintComponent.constraintsVisible = false;
+                scheduleComponent.scheduleVisible = false;
+                this.app1Visible = true;
+            }
+        }
+    },
+    mounted: function () {
+        window.addEventListener('hashchange', this.restorePage);
+        window.addEventListener('load', this.restorePage);
     }
 })
 
@@ -59,7 +80,7 @@ let constraintComponent = new Vue({
             const xhr = new XMLHttpRequest();
             const statusEl = document.querySelector('form#form-csv div.form-status');
             xhr.addEventListener('load', () => {
-                if (xhr.status === 200) {
+                if (Math.floor(xhr.status / 100) === 2) {
                     statusEl.classList.add('success');
                     statusEl.textContent = 'CSV upload succeeded';
                 }
