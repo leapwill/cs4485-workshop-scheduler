@@ -46,6 +46,12 @@ let constraintComponent = new Vue({
         }
     },
     methods: {
+        addRow: function (e) {
+            // TODO: is there a better way to do this, like passing an arg from the v-on:click ?
+            let category = e.target.parentElement.querySelector('strong').textContent.toLowerCase();
+            let nextId = this.constraints2[category][this.constraints2[category].length - 1].id + 1;
+            this.constraints2[category].push({ id: nextId, value: 'TODO' });
+        },
         submitCsv: function (e) {
             e.preventDefault();
             const file = document.querySelector('form#form-csv input[type="file"]').files[0];
