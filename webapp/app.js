@@ -61,14 +61,18 @@ let constraintComponent = new Vue({
                 { id: 1001, 'name': 'Catherine Adkins', instruments: ['Cello'] }
             ],
             'rooms': [10, 5, 2] /* small, medium, large */
+        },
+        defaults: {
+            'instructors': { id: 0, 'name': '', instruments: [] }
         }
     },
     methods: {
-        addRow: function (e) {
-            // TODO: is there a better way to do this, like passing an arg from the v-on:click ?
-            let category = e.target.parentElement.parentElement.querySelector('strong').textContent.toLowerCase();
-            let nextId = this.constraints2[category][this.constraints2[category].length - 1].id + 1;
-            this.constraints2[category].push({ id: nextId, value: 'TODO' });
+        addRow: function (e, type) {
+            let nextId = this.constraints2[type][this.constraints2[type].length - 1].id + 1;
+            let newItem = {};
+            Object.assign(newItem, this.defaults[type]);
+            newItem.id = nextId;
+            this.constraints2[type].push(newItem);
         },
         submitCsv: function (e) {
             e.preventDefault();
