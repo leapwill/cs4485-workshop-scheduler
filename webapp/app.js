@@ -60,6 +60,13 @@ let constraintComponent = new Vue({
                 { id: 1000, 'name': 'Ray Lewis', instruments: ['Violin', 'Viola'] },
                 { id: 1001, 'name': 'Catherine Adkins', instruments: ['Cello'] }
             ],
+            'classtypes': [
+                { 'type': 'Master Class', instruments: [], count: 0 },
+                { 'type': 'Workshop', instruments: [], count: 0 },
+                { 'type': 'Chamber Orchestra', count: 0 },
+                { 'type': 'Elective Art', count: 0 },
+                { 'type': 'Elective Composition', count: 0 }
+            ],
             'rooms': [10, 5, 2] /* small, medium, large */
         },
         defaults: {
