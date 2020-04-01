@@ -45,7 +45,7 @@ Vue.component('constraintitem', {
 
 let constraintComponent = new Vue({
     // TODO: fetch existing constraints from server and fill in
-    el: '#constraints',
+    el: '#constraints-app',
     data: {
         constraintsVisible: false,
         //eventually the constraints will all be built and returned by reading
@@ -60,16 +60,13 @@ let constraintComponent = new Vue({
                 { id: 1000, 'name': 'Ray Lewis', instruments: ['Violin', 'Viola'] },
                 { id: 1001, 'name': 'Catherine Adkins', instruments: ['Cello'] }
             ],
-            'rooms': [
-                { id: 2000, 'number': 'NW 1204', capacity: 8 },
-                { id: 2001, 'number': 'NE 1010', capacity: 40 }
-            ]
+            'rooms': [10, 5, 2] /* small, medium, large */
         }
     },
     methods: {
         addRow: function (e) {
             // TODO: is there a better way to do this, like passing an arg from the v-on:click ?
-            let category = e.target.parentElement.querySelector('strong').textContent.toLowerCase();
+            let category = e.target.parentElement.parentElement.querySelector('strong').textContent.toLowerCase();
             let nextId = this.constraints2[category][this.constraints2[category].length - 1].id + 1;
             this.constraints2[category].push({ id: nextId, value: 'TODO' });
         },

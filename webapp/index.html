@@ -37,7 +37,7 @@
             </div>
         </div>
         <!-- Constraints input page -->
-        <div id="constraints" v-if="constraintsVisible">
+        <div id="constraints-app" v-if="constraintsVisible">
             Constraints are Visible
             <constraintItem v-for="item in constraints" v-bind:constraint="item" v-bind:key="item.id">
             </constraintItem>
@@ -50,21 +50,42 @@
                 <!-- TODO: loading spinner and success/failure message -->
                 <div class="form-status"></div>
             </form>
+
             <!-- TODO: maybe make this page a <form> with <section>s for easier submitting to server -->
-            <div v-for="(cons, ctype) in constraints2" class="panel">
+            <div v-for="(cons, ctype) in constraints2" class="panel constraints-panels">
                 <div style="text-transform: capitalize;"><strong>{{ ctype }}</strong></div>
-                <div v-for="item in cons" style="border-bottom: 1px solid gray;">
-                    <!-- TODO: remove inline styles -->
-                    <div v-for="(v, k) in item">
-                        <!-- TODO use id="{{item.id}}_{{k}}" for Vue form stuff -->
-                        <div v-if="k === 'id'" style="display: none;"><input type="hidden" :value="v"></div>
-                        <div v-else>{{ k }}: <input type="text" :value="v"></div>
-                        <!-- TODO: use other types of input for arrays -->
-                    </div>
-                    <!-- TODO: button to delete this row -->
+
+                <div v-if="ctype === 'rooms'" id="constraints-rooms">
+                    <label>
+                        Small (10 students):
+                        <input type="number" :value="cons[0]" min="0" max="99">
+                    </label><br>
+                    <label>
+                        Medium (10-25 students):
+                        <input type="number" :value="cons[1]" min="0" max="99">
+                    </label><br>
+                    <label>
+                        Large (25+ students):
+                        <input type="number" :value="cons[2]" min="0" max="99">
+                    </label><br>
                 </div>
-                <button v-on:click="addRow">Add Entry</button>
+
+                <div v-else>
+                    <div v-for="item in cons" style="border-bottom: 1px solid gray;">
+                        <!-- TODO: remove inline styles -->
+                        <div v-for="(v, k) in item">
+                            <!-- TODO use id="{{item.id}}_{{k}}" for Vue form stuff -->
+                            <div v-if="k === 'id'" style="display: none;"><input type="hidden" :value="v"></div>
+                            <div v-else>{{ k }}: <input type="text" :value="v"></div>
+                            <!-- TODO: use other types of input for arrays -->
+                        </div>
+                        <!-- TODO: button to delete this row -->
+                    </div>
+                    <button v-on:click="addRow">Add Entry</button>
+                </div>
+
             </div>
+
         </div>
         <!-- Schedule results page -->
         <div id='schedule'>
