@@ -75,8 +75,30 @@
                         <!-- TODO: remove inline styles -->
                         <div v-for="(v, k) in item">
                             <!-- TODO use id="{{item.id}}_{{k}}" for Vue form stuff -->
-                            <div v-if="k === 'id'" style="display: none;"><input type="hidden" :value="v"></div>
-                            <div v-else>{{ k }}: <input type="text" :value="v"></div>
+                            <!-- TODO (better) use v-model -->
+                            <div v-if="k === 'id'" style="display: none;">
+                                <input type="hidden" :value="v">
+                            </div>
+                            <div v-else-if="k === 'instruments'">
+                                <fieldset>
+                                    {{ k }}:
+                                    <label><input :name="item.id + 'instruments'" type="checkbox" value="Cello"
+                                            :checked="v.includes('Cello')">
+                                        Cello</label>
+                                    <label><input :name="item.id + 'instruments'" type="checkbox" value="Violin"
+                                            :checked="v.includes('Violin')">
+                                        Violin</label>
+                                    <label><input :name="item.id + 'instruments'" type="checkbox" value="Viola"
+                                            :checked="v.includes('Viola')">
+                                        Viola</label>
+                                    <label><input :name="item.id + 'instruments'" type="checkbox" value="Piano"
+                                            :checked="v.includes('Piano')">
+                                        Piano</label>
+                                </fieldset>
+                            </div>
+                            <div v-else>
+                                <label>{{ k }}:<input type="text" :value="v"></label>
+                            </div>
                             <!-- TODO: use other types of input for arrays -->
                         </div>
                         <!-- TODO: button to delete this row -->
