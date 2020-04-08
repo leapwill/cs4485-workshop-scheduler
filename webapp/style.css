@@ -96,3 +96,13 @@ button.btn-inverted:hover {
 #constraints-rooms input[type="number"] {
     width: 8ch;
 }
+
+.constraint-row {
+    border-bottom: 1px solid gray;
+    padding: 8px;
+    display: flex;
+}
+
+.btn-add {
+    margin-top: 8px;
+}

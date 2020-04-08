@@ -35,42 +35,53 @@ let app = new Vue({
         window.addEventListener('hashchange', this.restorePage);
         window.addEventListener('load', this.restorePage);
     }
-})
-
-Vue.component('constraintitem', {
-    props: ['constraint'],
-    template:
-        `<div>{{constraint.type}} : {{constraint.value}}</div>`
-})
+});
 
 let constraintComponent = new Vue({
     // TODO: fetch existing constraints from server and fill in
     el: '#constraints-app',
     data: {
         constraintsVisible: false,
-        //eventually the constraints will all be built and returned by reading
-        //the list file
-        constraints: [
-            { id: 0, type: 'times', value: '10-2' },
-            { id: 1, type: 'teachers', value: 'Will' },
-            { id: 2, type: 'unique students', value: ['James', 'Michael'] }
-        ],
         constraints2: {
             'instructors': [
-                { id: 1000, 'name': 'Ray Lewis', instruments: ['Violin', 'Viola'] },
-                { id: 1001, 'name': 'Catherine Adkins', instruments: ['Cello'] }
+                {
+                    id: 1000, name: 'Ray Lewis', instruments: [
+                        { name: 'Violin', canTeach: true, bookLevels: [2, 3, 4] },
+                        { name: 'Viola', canTeach: true, bookLevels: [6, 7] },
+                        { name: 'Cello', canTeach: false, bookLevels: [] },
+                        { name: 'Piano', canTeach: false, bookLevels: [] }
+                    ],
+                    availableSlots: [1, 2, 3, 4, 5], maxSlots: 5
+                },
+                {
+                    id: 1001, name: 'Catherine Adkins', instruments: [
+                        { name: 'Violin', canTeach: false, bookLevels: [] },
+                        { name: 'Viola', canTeach: false, bookLevels: [] },
+                        { name: 'Cello', canTeach: true, bookLevels: [1, 2, 3, 4, 5] },
+                        { name: 'Piano', canTeach: false, bookLevels: [] }
+                    ],
+                    availableSlots: [3, 4, 5], maxSlots: 2
+                },
             ],
             'classtypes': [
-                { 'type': 'Master Class', instruments: [], count: 0 },
-                { 'type': 'Workshop', instruments: [], count: 0 },
-                { 'type': 'Chamber Orchestra', count: 0 },
-                { 'type': 'Elective Art', count: 0 },
-                { 'type': 'Elective Composition', count: 0 }
+                { type: 'Master Class', instruments: [], count: 0 },
+                { type: 'Workshop', instruments: [], count: 0 },
+                { type: 'Chamber Orchestra', count: 0 },
+                { type: 'Elective Art', count: 0 },
+                { type: 'Elective Composition', count: 0 }
             ],
             'rooms': [10, 5, 2] /* small, medium, large */
         },
         defaults: {
-            'instructors': { id: 0, 'name': '', instruments: [] }
+            instructors: {
+                id: 9999, name: '', instruments: [
+                    { name: 'Violin', canTeach: false, bookLevels: [] },
+                    { name: 'Viola', canTeach: false, bookLevels: [] },
+                    { name: 'Cello', canTeach: false, bookLevels: [] },
+                    { name: 'Piano', canTeach: false, bookLevels: [] }
+                ],
+                availableSlots: [], maxSlots: 0
+            },
         }
     },
     methods: {
@@ -113,23 +124,11 @@ let constraintComponent = new Vue({
             reader.readAsBinaryString(file);
         }
     }
-})
+});
 
 let scheduleComponent = new Vue({
     el: '#schedule',
     data: {
         scheduleVisible: false
     }
-})
-
-
-/*
-NOTES
-
-okaaay... so that's the extremely simple stuff put together. At the moment,
-especially considering exactly what we're trying to build, I don't think a
-single page-app is outside the realm of possibility.
-
-Considering using a v-for (vue directive runs on each thing in a collection) to
-render constraints in their own components. Will need to see how that works.
-*/
+});

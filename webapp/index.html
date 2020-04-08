@@ -38,9 +38,6 @@
         </div>
         <!-- Constraints input page -->
         <div id="constraints-app" v-if="constraintsVisible">
-            Constraints are Visible
-            <constraintItem v-for="item in constraints" v-bind:constraint="item" v-bind:key="item.id">
-            </constraintItem>
             <form v-on:submit="submitCsv" id="form-csv" class="panel">
                 <div><strong>Student Data CSV</strong></div>
                 <input type="file" accept=".csv">
@@ -71,7 +68,7 @@
                 </div>
 
                 <div v-else>
-                    <div v-for="item in cons" style="border-bottom: 1px solid gray;">
+                    <div v-for="item in cons" class="constraint-row">
                         <!-- TODO: remove inline styles -->
                         <div v-for="(v, k) in item">
                             <!-- TODO use id="{{item.id}}_{{k}}" for Vue form stuff -->
@@ -101,9 +98,12 @@
                                 <!-- TODO: use input[type="number"] for numbers (class type count) -->
                             </div>
                         </div>
-                        <!-- TODO: button to delete this row -->
+                        <div>
+                            <!-- TODO: button to delete this row -->
+                            <button disabled>Delete</button>
+                        </div>
                     </div>
-                    <button v-on:click="addRow($event, ctype)">Add Entry</button>
+                    <button v-on:click="addRow($event, ctype)" class="btn-add">Add Entry</button>
                 </div>
 
             </div>
