@@ -48,71 +48,96 @@
                 <div class="form-status"></div>
             </form>
 
-            <!-- TODO: maybe make this page a <form> with <section>s for easier submitting to server -->
-            <div v-for="(cons, ctype) in constraints2" class="panel constraints-panels">
+            <div v-for="(cons, ctype) in constraints2" v-if="ctype !== 'rooms'" class="panel">
                 <div style="text-transform: capitalize;"><strong>{{ ctype }}</strong></div>
 
-                <div v-if="ctype === 'rooms'" id="constraints-rooms">
-                    <label>
-                        Small (10 students):
-                        <input type="number" :value="cons[0]" min="0" max="99">
-                    </label><br>
-                    <label>
-                        Medium (10-25 students):
-                        <input type="number" :value="cons[1]" min="0" max="99">
-                    </label><br>
-                    <label>
-                        Large (25+ students):
-                        <input type="number" :value="cons[2]" min="0" max="99">
-                    </label><br>
-                </div>
-
-                <div v-else>
-                    <div v-for="item in cons" class="constraint-row">
-                        <!-- TODO: remove inline styles -->
-                        <div v-for="(v, k) in item">
-                            <!-- TODO use id="{{item.id}}_{{k}}" for Vue form stuff -->
-                            <!-- TODO (better) use v-model -->
-                            <div v-if="k === 'id'" style="display: none;">
-                                <input type="hidden" :value="v">
-                            </div>
-                            <div v-else-if="k === 'instruments'">
-                                <fieldset>
-                                    {{ k }}:
-                                    <label><input :name="item.id + 'instruments'" type="checkbox" value="Cello"
-                                            :checked="v.includes('Cello')">
-                                        Cello</label>
-                                    <label><input :name="item.id + 'instruments'" type="checkbox" value="Violin"
-                                            :checked="v.includes('Violin')">
-                                        Violin</label>
-                                    <label><input :name="item.id + 'instruments'" type="checkbox" value="Viola"
-                                            :checked="v.includes('Viola')">
-                                        Viola</label>
-                                    <label><input :name="item.id + 'instruments'" type="checkbox" value="Piano"
-                                            :checked="v.includes('Piano')">
-                                        Piano</label>
-                                </fieldset>
-                            </div>
-                            <div v-else>
-                                <label>{{ k }}:<input type="text" :value="v"></label>
-                                <!-- TODO: use input[type="number"] for numbers (class type count) -->
-                            </div>
+                <div v-for="item in cons" class="constraint-row">
+                    <!-- TODO: remove inline styles -->
+                    <div v-for="(v, k) in item">
+                        <div v-if="k === 'id'" class="d-none">
+                            <input type="hidden" :value="v">
                         </div>
-                        <div>
-                            <!-- TODO: button to delete this row -->
-                            <button disabled>Delete</button>
+                        <div v-else-if="k === 'instruments' && ctype === 'instructors'">
+                            {{ k }}:
+                            <fieldset>
+                                <div v-for="instrument in v">
+                                    <label><input type="checkbox"
+                                            v-model="instrument.canTeach">{{ instrument.name }}</label>
+                                    <div v-if="instrument.canTeach">
+                                        <fieldset>
+                                            Book Levels<br>
+                                            <div v-for="lvl in 10" class="d-inline-block">
+                                                <label><input type="checkbox" v-model="instrument.bookLevels"
+                                                        :value="lvl">{{ lvl }}</label>
+                                            </div>
+                                        </fieldset>
+                                    </div>
+                                </div>
+                            </fieldset>
+                        </div>
+                        <div v-else-if="k === 'instruments'">
+                            {{ k }}:
+                            <fieldset>
+                                <label><input type="checkbox" value="Cello" v-model="item[k]">
+                                    Cello</label>
+                                <label><input type="checkbox" value="Violin" v-model="item[k]">
+                                    Violin</label>
+                                <label><input type="checkbox" value="Viola" v-model="item[k]">
+                                    Viola</label>
+                                <label><input type="checkbox" value="Piano" v-model="item[k]">
+                                    Piano</label>
+                            </fieldset>
+                        </div>
+                        <div v-else-if="k === 'availableSlots'">
+                            {{ k }}:
+                            <fieldset>
+                                <div v-for="slot in 5" class="d-inline-block">
+                                    <label><input type="checkbox" v-model="item.availableSlots"
+                                            :value="slot">{{ slot }}</label>
+                                </div>
+                            </fieldset>
+                        </div>
+                        <div v-else>
+                            <div v-if="typeof k === 'number'">
+
+                            </div>
+                            <label>{{ k }}:
+                                <input v-if="typeof v === 'number'" type="number" v-model="item[k]" min="0" max="99">
+                                <input v-else type="text" v-model="item[k]">
+                            </label>
                         </div>
                     </div>
-                    <button v-on:click="addRow($event, ctype)" class="btn-add">Add Entry</button>
+                    <div>
+                        <!-- TODO: button to delete this row -->
+                        <button disabled>Delete</button>
+                    </div>
                 </div>
-
+                <button v-on:click="addRow($event, ctype)" class="btn-add">Add Entry</button>
+            </div>
+            <!-- Counts of small/medium/large rooms -->
+            <div id="constraints-rooms" class="panel">
+                <div><strong>Rooms</strong></div>
+                <label>
+                    Small (10 students):
+                    <input type="number" v-model.number="constraints2.rooms[0]" min="0" max="99">
+                </label><br>
+                <label>
+                    Medium (10-25 students):
+                    <input type="number" v-model.number="constraints2.rooms[1]" min="0" max="99">
+                </label><br>
+                <label>
+                    Large (25+ students):
+                    <input type="number" v-model.number="constraints2.rooms[2]" min="0" max="99">
+                </label><br>
             </div>
 
         </div>
+
         <!-- Schedule results page -->
         <div id='schedule'>
             <div v-if="scheduleVisible">Schedule is Visible</div>
         </div>
+
     </div>
     <script src="app.js"></script>
 </body>

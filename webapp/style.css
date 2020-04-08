@@ -93,7 +93,7 @@ button.btn-inverted:hover {
     border: 2px solid red;
 }
 
-#constraints-rooms input[type="number"] {
+#constraints-app input[type="number"] {
     width: 8ch;
 }
 
@@ -101,8 +101,17 @@ button.btn-inverted:hover {
     border-bottom: 1px solid gray;
     padding: 8px;
     display: flex;
+    justify-content: space-between;
 }
 
 .btn-add {
     margin-top: 8px;
+}
+
+.d-inline-block {
+    display: inline-block;
+}
+
+.d-none {
+    display: none;
 }
