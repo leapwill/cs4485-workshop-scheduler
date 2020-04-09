@@ -104,6 +104,11 @@ button.btn-inverted:hover {
     justify-content: space-between;
 }
 
+.constraint-row label {
+    display: inline-block;
+    margin-right: 24px;
+}
+
 .btn-add {
     margin-top: 8px;
 }

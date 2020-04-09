@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>SMID Summer Workshop Scheduler</title>
     <link rel="stylesheet" href="style.css" />
     <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
 </head>
@@ -38,6 +38,87 @@
         </div>
         <!-- Constraints input page -->
         <div id="constraints-app" v-if="constraintsVisible">
+            <form v-on:submit="submitCsv" id="form-csv" class="panel">
+                <div><strong>Student Data CSV</strong></div>
+                <input type="file" accept=".csv">
+                <div style="color: red;">WARNING: This will reset the workshop data!</div>
+                <!-- TODO: figure out if this is true -->
+                <input type="submit" value="Upload">
+                <!-- TODO: loading spinner and success/failure message -->
+                <div class="form-status"></div>
+            </form>
+            <!-- Workshop setup -->
+            <div class="panel">
+                <section>
+                    <strong>Instruments in this workshop</strong>
+                    <div v-for="inst in constraints3.workshop_instruments">
+                        <label><input type="checkbox" v-model="inst.isEnabled">{{ inst.name }}</label>
+                        <fieldset v-if="inst.isEnabled">
+                            <label>Lowest book level: <input type="number" v-model.number="inst.bookLevelMin" min="1"
+                                    max="99"></label>
+                            <label>Highest book level: <input type="number" v-model.number="inst.bookLevelMax" min="1"
+                                    max="99"></label>
+                        </fieldset>
+                    </div>
+                </section>
+                <section>
+                    <strong>Schedule slots:</strong>
+                    <input type="number" v-model.number="constraints3.workshop_schedule_slots" min="1" max="99">
+                </section>
+            </div>
+            <!-- Class information -->
+            <div class="panel">
+                <strong>Classes in this workshop</strong>
+                <div v-for="classitem in constraints3.classes" class="constraint-row">
+                    <div>
+                        <label>Name: <input type="text" v-model.trim="classitem.name"></label>
+                        <label>Required? <input type="checkbox" v-model="classitem.isRequired"></label>
+                        <label>Room size: <select v-model.number="classitem.roomSize">
+                                <option value="0">Small (10 students)</option>
+                                <option value="1">Medium (10-25 students)</option>
+                                <option value="2">Large (25+ students)</option>
+                            </select></label>
+                        <label>Maximum students: <input type="number" v-model="classitem.enrollmentMax" min="1"
+                                max="99"></label>
+                        <label>Needs accompanist? <input type="checkbox" v-model="classitem.needsAccompanist"></label>
+                        <label>Book level constraints <input type="checkbox" v-model="classitem.isBookBased"></label>
+                        <fieldset v-if="classitem.isBookBased">
+                            <label>Lowest book level: <input type="number" v-model.number="classitem.bookLevelMin"
+                                    min="1" max="99"></label>
+                            <label>Highest book level: <input type="number" v-model.number="classitem.bookLevelMax"
+                                    min="1" max="99"></label>
+                        </fieldset>
+                        <label>Age constraints <input type="checkbox" v-model="classitem.isAgeBased"></label>
+                        <fieldset v-if="classitem.isAgeBased">
+                            <label>Lowest age: <input type="number" v-model.number="classitem.ageMin" min="1"
+                                    max="99"></label>
+                            <label>Highest age: <input type="number" v-model.number="classitem.ageMax" min="1"
+                                    max="99"></label>
+                        </fieldset>
+                        <label>Instrument constraints <input type="checkbox"
+                                v-model="classitem.isInstrumentBased"></label>
+                        <fieldset v-if="classitem.isInstrumentBased">
+                            <label v-for="inst in constraints3.workshop_instruments">
+                                <input type="checkbox" v-model="classitem.instruments" :value="inst.name">
+                                {{ inst.name }}
+                            </label>
+                        </fieldset>
+                    </div>
+                    <div>
+                        <button v-on:click="deleteEntry($event, 'classes', classitem.id)">Delete</button>
+                    </div>
+                </div>
+                <button v-on:click="addEntry($event, 'classes')" class="btn-add">Add Class</button>
+            </div>
+            <div class="panel">
+                <strong>Instructors</strong>
+                <!-- TODO instructors-->
+            </div>
+            <!-- TODO submit button to POST constraints3 object -->
+        </div>
+
+        <!-- TODO: delete after refactor based on new email 2020-04-09 -->
+        <div id="constraints-app-old" style="display: none;">
             <form v-on:submit="submitCsv" id="form-csv" class="panel">
                 <div><strong>Student Data CSV</strong></div>
                 <input type="file" accept=".csv">
@@ -112,7 +193,7 @@
                         <button disabled>Delete</button>
                     </div>
                 </div>
-                <button v-on:click="addRow($event, ctype)" class="btn-add">Add Entry</button>
+                <button v-on:click="addEntry($event, ctype)" class="btn-add">Add Entry</button>
             </div>
             <!-- Counts of small/medium/large rooms -->
             <div id="constraints-rooms" class="panel">

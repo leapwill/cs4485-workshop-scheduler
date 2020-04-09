@@ -82,15 +82,38 @@ let constraintComponent = new Vue({
                 ],
                 availableSlots: [], maxSlots: 0
             },
+            classes: { name: '', id: 2000, isRequired: false, isBookBased: false, bookLevelMin: 1, bookLevelMax: 3, isAgeBased: false, ageMin: 7, ageMax: 10, isInstrumentBased: false, instruments: [], roomSize: 0, enrollmentMax: 10, needsAccompanist: false }
+        },
+        constraints3: {
+            workshop_instruments: [
+                { name: 'Piano', isEnabled: false, bookLevelMin: 1, bookLevelMax: 10 },
+                { name: 'Harp', isEnabled: false, bookLevelMin: 1, bookLevelMax: 10 },
+                { name: 'Accompanist Piano', isEnabled: false, bookLevelMin: 1, bookLevelMax: 10 },
+                { name: 'Violin', isEnabled: false, bookLevelMin: 1, bookLevelMax: 10 },
+                { name: 'Viola', isEnabled: false, bookLevelMin: 1, bookLevelMax: 10 },
+                { name: 'Cello', isEnabled: false, bookLevelMin: 1, bookLevelMax: 10 }
+            ],
+            workshop_schedule_slots: 5,
+            classes: []
         }
     },
     methods: {
-        addRow: function (e, type) {
-            let nextId = this.constraints2[type][this.constraints2[type].length - 1].id + 1;
+        addEntry: function (e, type) {
             let newItem = {};
-            Object.assign(newItem, this.defaults[type]);
-            newItem.id = nextId;
-            this.constraints2[type].push(newItem);
+            newItem = Object.assign(newItem, this.defaults[type])
+            if (this.constraints3[type].length !== 0) {
+                let nextId = this.constraints3[type][this.constraints3[type].length - 1].id + 1;
+                newItem.id = nextId;
+            }
+            this.constraints3[type].push(newItem);
+        },
+        deleteEntry: function (e, type, id) {
+            for (i = 0; i < this.constraints3[type].length; i++) {
+                if (this.constraints3[type][i].id === id) {
+                    this.constraints3[type].splice(i, 1);
+                    break;
+                }
+            }
         },
         submitCsv: function (e) {
             e.preventDefault();
