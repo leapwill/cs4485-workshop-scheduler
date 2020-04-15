@@ -122,6 +122,7 @@ let constraintComponent = new Vue({
             const xhr = new XMLHttpRequest();
             const statusEl = document.querySelector('form#form-csv div.form-status');
             xhr.addEventListener('load', () => {
+                // TODO: refactor to fetch() and use setFormStatus()
                 if (Math.floor(xhr.status / 100) === 2) {
                     statusEl.classList.add('success');
                     statusEl.textContent = 'CSV upload succeeded';
@@ -145,6 +146,26 @@ let constraintComponent = new Vue({
                 xhr.send(btoa(e.target.result));
             });
             reader.readAsBinaryString(file);
+        },
+        submitConstraints: async function () {
+            let response = await fetch('post_constraints', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(this.constraints3)
+            });
+            let statusEl = document.querySelector('#btn-constraints + div.form-status');
+            this.setFormStatus(statusEl, response);
+        },
+        setFormStatus(statusEl, response) {
+            if (Math.floor(response.status / 100) === 2) {
+                statusEl.classList.add('success');
+                statusEl.textContent = 'Submit succeeded';
+            }
+            else {
+                statusEl.classList.add('error');
+                statusEl.textContent = 'Submit failed: ' + response.statusText;
+                console.error(response);
+            }
         }
     }
 });
