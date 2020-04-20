@@ -1,228 +1,396 @@
 <!DOCTYPE html>
 <html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>SMID Summer Workshop Scheduler</title>
     <link rel="stylesheet" href="style.css" />
     <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
-</head>
+  </head>
 
-<body>
+  <body>
     <header>
-        SMID Summer Workshop Scheduler
+      SMID Summer Workshop Scheduler
     </header>
     <div id="content">
-        <!-- Homepage -->
-        <div id="app" v-if="app1Visible">
-            {{ message }}
-            <br>
-            <div class="panel flex">
-                <button v-on:click="selectConstraints">
-                    Enter Constraints
-                </button>
-                <div>
-                    Create or change the data for a workshop
-                </div>
-            </div>
-            <br>
-            <div class="panel flex">
-                <button v-on:click="selectSchedule">
-                    View Schedules
-                </button>
-                <div>
-                    Look at generated schedules for a workshop
-                </div>
-            </div>
+      <!-- Homepage -->
+      <div id="app" v-if="app1Visible">
+        {{ message }}
+        <br />
+        <div class="panel flex">
+          <button v-on:click="selectConstraints">
+            Enter Constraints
+          </button>
+          <div>
+            Create or change the data for a workshop
+          </div>
         </div>
-        <!-- Constraints input page -->
-        <div id="constraints-app" v-if="constraintsVisible">
-            <form v-on:submit="submitCsv" id="form-csv" class="panel">
-                <div><strong>Student Data CSV</strong></div>
-                <input type="file" accept=".csv">
-                <div style="color: red;">WARNING: This will reset the workshop data!</div>
-                <!-- TODO: figure out if this is true -->
-                <input type="submit" value="Upload">
-                <!-- TODO: loading spinner and success/failure message -->
-                <div class="form-status"></div>
-            </form>
-            <!-- Workshop setup -->
-            <div class="panel">
-                <section>
-                    <strong>Instruments in this workshop</strong>
-                    <div v-for="inst in constraints3.workshop_instruments">
-                        <label><input type="checkbox" v-model="inst.isEnabled">{{ inst.name }}</label>
-                        <fieldset v-if="inst.isEnabled">
-                            <label>Lowest book level: <input type="number" v-model.number="inst.bookLevelMin" min="1"
-                                    max="99"></label>
-                            <label>Highest book level: <input type="number" v-model.number="inst.bookLevelMax" min="1"
-                                    max="99"></label>
-                        </fieldset>
-                    </div>
-                </section>
-                <section>
-                    <strong>Schedule slots:</strong>
-                    <input type="number" v-model.number="constraints3.workshop_schedule_slots" min="1" max="99">
-                </section>
+        <br />
+        <div class="panel flex">
+          <button v-on:click="selectSchedule">
+            View Schedules
+          </button>
+          <div>
+            Look at generated schedules for a workshop
+          </div>
+        </div>
+      </div>
+      <!-- Constraints input page -->
+      <div id="constraints-app" v-if="constraintsVisible">
+        <form v-on:submit="submitCsv" id="form-csv" class="panel">
+          <div><strong>Student Data CSV</strong></div>
+          <input type="file" accept=".csv" />
+          <div style="color: red;">
+            WARNING: This will reset the workshop data!
+          </div>
+          <!-- TODO: figure out if this is true -->
+          <input type="submit" value="Upload" />
+          <!-- TODO: loading spinner and success/failure message -->
+          <div class="form-status"></div>
+        </form>
+        <!-- Workshop setup -->
+        <div class="panel">
+          <section>
+            <strong>Instruments in this workshop</strong>
+            <div v-for="inst in constraints3.workshop_instruments">
+              <label
+                ><input type="checkbox" v-model="inst.isEnabled" />{{ inst.name
+                }}</label
+              >
+              <fieldset v-if="inst.isEnabled">
+                <label
+                  >Lowest book level:
+                  <input
+                    type="number"
+                    v-model.number="inst.bookLevelMin"
+                    min="1"
+                    max="99"
+                /></label>
+
+                <label
+                  >Highest book level:
+                  <input
+                    type="number"
+                    v-model.number="inst.bookLevelMax"
+                    min="1"
+                    max="99"
+                /></label>
+              </fieldset>
             </div>
-            <!-- Class information -->
-            <div class="panel">
-                <strong>Classes in this workshop</strong>
-                <div v-for="classitem in constraints3.classes" class="constraint-row">
-                    <div>
-                        <label>Name: <input type="text" v-model.trim="classitem.name"></label>
-                        <label>Required? <input type="checkbox" v-model="classitem.isRequired"></label>
-                        <label>Room size: <select v-model.number="classitem.roomSize">
-                                <option value="0">Small (10 students)</option>
-                                <option value="1">Medium (10-25 students)</option>
-                                <option value="2">Large (25+ students)</option>
-                            </select></label>
-                        <label>Maximum students: <input type="number" v-model="classitem.enrollmentMax" min="1"
-                                max="99"></label>
-                        <label>Needs accompanist? <input type="checkbox" v-model="classitem.needsAccompanist"></label>
-                        <label>Book level constraints <input type="checkbox" v-model="classitem.isBookBased"></label>
-                        <fieldset v-if="classitem.isBookBased">
-                            <label>Lowest book level: <input type="number" v-model.number="classitem.bookLevelMin"
-                                    min="1" max="99"></label>
-                            <label>Highest book level: <input type="number" v-model.number="classitem.bookLevelMax"
-                                    min="1" max="99"></label>
-                        </fieldset>
-                        <label>Age constraints <input type="checkbox" v-model="classitem.isAgeBased"></label>
-                        <fieldset v-if="classitem.isAgeBased">
-                            <label>Lowest age: <input type="number" v-model.number="classitem.ageMin" min="1"
-                                    max="99"></label>
-                            <label>Highest age: <input type="number" v-model.number="classitem.ageMax" min="1"
-                                    max="99"></label>
-                        </fieldset>
-                        <label>Instrument constraints <input type="checkbox"
-                                v-model="classitem.isInstrumentBased"></label>
-                        <fieldset v-if="classitem.isInstrumentBased">
-                            <label v-for="inst in constraints3.workshop_instruments">
-                                <input type="checkbox" v-model="classitem.instruments" :value="inst.name">
-                                {{ inst.name }}
-                            </label>
-                        </fieldset>
-                    </div>
-                    <div>
-                        <button v-on:click="deleteEntry($event, 'classes', classitem.id)">Delete</button>
+          </section>
+          <section>
+            <strong>Schedule slots:</strong>
+            <input
+              type="number"
+              v-model.number="constraints3.workshop_schedule_slots"
+              min="1"
+              max="99"
+            />
+          </section>
+        </div>
+        <!-- Class information -->
+        <div class="panel">
+          <strong>Classes in this workshop</strong>
+          <div v-for="classitem in constraints3.classes" class="constraint-row">
+            <div>
+              <label
+                >Name: <input type="text" v-model.trim="classitem.name"
+              /></label>
+              <label
+                >Required?
+                <input type="checkbox" v-model="classitem.isRequired"
+              /></label>
+              <label
+                >Room size:
+                <select v-model.number="classitem.roomSize">
+                  <option value="0">Small (10 students)</option>
+                  <option value="1">Medium (10-25 students)</option>
+                  <option value="2">Large (25+ students)</option>
+                </select></label
+              >
+              <label
+                >Maximum students:
+                <input
+                  type="number"
+                  v-model="classitem.enrollmentMax"
+                  min="1"
+                  max="99"
+              /></label>
+
+              <label
+                >Needs accompanist?
+                <input type="checkbox" v-model="classitem.needsAccompanist"
+              /></label>
+              <label
+                >Book level constraints
+                <input type="checkbox" v-model="classitem.isBookBased"
+              /></label>
+              <fieldset v-if="classitem.isBookBased">
+                <label
+                  >Lowest book level:
+                  <input
+                    type="number"
+                    v-model.number="classitem.bookLevelMin"
+                    min="1"
+                    max="99"
+                /></label>
+
+                <label
+                  >Highest book level:
+                  <input
+                    type="number"
+                    v-model.number="classitem.bookLevelMax"
+                    min="1"
+                    max="99"
+                /></label>
+              </fieldset>
+              <label
+                >Age constraints
+                <input type="checkbox" v-model="classitem.isAgeBased"
+              /></label>
+              <fieldset v-if="classitem.isAgeBased">
+                <label
+                  >Lowest age:
+                  <input
+                    type="number"
+                    v-model.number="classitem.ageMin"
+                    min="1"
+                    max="99"
+                /></label>
+
+                <label
+                  >Highest age:
+                  <input
+                    type="number"
+                    v-model.number="classitem.ageMax"
+                    min="1"
+                    max="99"
+                /></label>
+              </fieldset>
+              <label
+                >Instrument constraints
+                <input type="checkbox" v-model="classitem.isInstrumentBased"
+              /></label>
+
+              <fieldset v-if="classitem.isInstrumentBased">
+                <label v-for="inst in constraints3.workshop_instruments">
+                  <input
+                    type="checkbox"
+                    v-model="classitem.instruments"
+                    :value="inst.name"
+                  />
+                  {{ inst.name }}
+                </label>
+              </fieldset>
+            </div>
+            <div>
+              <button v-on:click="deleteEntry($event, 'classes', classitem.id)">
+                Delete
+              </button>
+            </div>
+          </div>
+          <button v-on:click="addEntry($event, 'classes')" class="btn-add">
+            Add Class
+          </button>
+        </div>
+        <div class="panel">
+          <strong>Instructors in this workshop</strong>
+          <div
+            v-for="instructoritem in constraints3.instructors"
+            class="constraint-row"
+          >
+            <div>
+              <label
+                >Name:
+                <input type="text" v-model.trim="instructoritem.name" />
+              </label>
+              <label>
+                Can teach the following instruments:
+                <div v-for="inst in constraints3.instructor_instruments">
+                  <label>
+                    <input type="checkbox" v-model="inst.isEnabled" />
+                    {{ inst.name }}
+                  </label>
+                </div>
+                <div v-for="classitem in constraints3.classes">
+                    <label>
+                        {{ classitem.name }}
+                        <input type="checkbox" v-model="instructor.classes" v-bind:value="classitem.id">
+                    </label>
+                </div>
+                <div v-for="class in instructor.classes">
+                    <div v-if="constraints3.classes[class.id].isBookBased">
+                        <div 
+                         v-for="i in range(constraints3.classes[class.id].bookLevelMin, constraints3.classes[class.id].bookLevelMax)">
+                            {{ i }}: <input type="checkbox" v-model="class.bookLevels" />
+                        </div>
                     </div>
                 </div>
-                <button v-on:click="addEntry($event, 'classes')" class="btn-add">Add Class</button>
+              </label>
             </div>
-            <div class="panel">
-                <strong>Instructors</strong>
-                <!-- TODO instructors-->
-            </div>
-            <!-- TODO submit button to POST constraints3 object -->
-            <button id="btn-constraints" v-on:click="submitConstraints()">Submit Constraints</button>
-            <div class="form-status"></div>
+          </div>
+          <button v-on:click="addEntry($event, 'instructors')">
+            Add Instructor
+          </button>
         </div>
+        <!-- TODO submit button to POST constraints3 object -->
+        <button id="btn-constraints" v-on:click="submitConstraints()">
+          Submit Constraints
+        </button>
+        <div class="form-status"></div>
+      </div>
 
-        <!-- TODO: delete after refactor based on new email 2020-04-09 -->
-        <div id="constraints-app-old" style="display: none;">
-            <form v-on:submit="submitCsv" id="form-csv" class="panel">
-                <div><strong>Student Data CSV</strong></div>
-                <input type="file" accept=".csv">
-                <div style="color: red;">WARNING: This will reset the workshop data!</div>
-                <!-- TODO: figure out if this is true -->
-                <input type="submit" value="Upload">
-                <!-- TODO: loading spinner and success/failure message -->
-                <div class="form-status"></div>
-            </form>
+      <!-- TODO: delete after refactor based on new email 2020-04-09 -->
+      <div id="constraints-app-old" style="display: none;">
+        <form v-on:submit="submitCsv" id="form-csv" class="panel">
+          <div><strong>Student Data CSV</strong></div>
+          <input type="file" accept=".csv" />
+          <div style="color: red;">
+            WARNING: This will reset the workshop data!
+          </div>
+          <!-- TODO: figure out if this is true -->
+          <input type="submit" value="Upload" />
+          <!-- TODO: loading spinner and success/failure message -->
+          <div class="form-status"></div>
+        </form>
 
-            <div v-for="(cons, ctype) in constraints2" v-if="ctype !== 'rooms'" class="panel">
-                <div style="text-transform: capitalize;"><strong>{{ ctype }}</strong></div>
+        <div
+          v-for="(cons, ctype) in constraints2"
+          v-if="ctype !== 'rooms'"
+          class="panel"
+        >
+          <div style="text-transform: capitalize;">
+            <strong>{{ ctype }}</strong>
+          </div>
 
-                <div v-for="item in cons" class="constraint-row">
-                    <!-- TODO: remove inline styles -->
-                    <div v-for="(v, k) in item">
-                        <div v-if="k === 'id'" class="d-none">
-                            <input type="hidden" :value="v">
+          <div v-for="item in cons" class="constraint-row">
+            <!-- TODO: remove inline styles -->
+            <div v-for="(v, k) in item">
+              <div v-if="k === 'id'" class="d-none">
+                <input type="hidden" :value="v" />
+              </div>
+              <div v-else-if="k === 'instruments' && ctype === 'instructors'">
+                {{ k }}:
+                <fieldset>
+                  <div v-for="instrument in v">
+                    <label
+                      ><input type="checkbox" v-model="instrument.canTeach" />{{
+                      instrument.name }}</label
+                    >
+                    <div v-if="instrument.canTeach">
+                      <fieldset>
+                        Book Levels<br />
+                        <div v-for="lvl in 10" class="d-inline-block">
+                          <label
+                            ><input
+                              type="checkbox"
+                              v-model="instrument.bookLevels"
+                              :value="lvl"
+                            />{{ lvl }}</label
+                          >
                         </div>
-                        <div v-else-if="k === 'instruments' && ctype === 'instructors'">
-                            {{ k }}:
-                            <fieldset>
-                                <div v-for="instrument in v">
-                                    <label><input type="checkbox"
-                                            v-model="instrument.canTeach">{{ instrument.name }}</label>
-                                    <div v-if="instrument.canTeach">
-                                        <fieldset>
-                                            Book Levels<br>
-                                            <div v-for="lvl in 10" class="d-inline-block">
-                                                <label><input type="checkbox" v-model="instrument.bookLevels"
-                                                        :value="lvl">{{ lvl }}</label>
-                                            </div>
-                                        </fieldset>
-                                    </div>
-                                </div>
-                            </fieldset>
-                        </div>
-                        <div v-else-if="k === 'instruments'">
-                            {{ k }}:
-                            <fieldset>
-                                <label><input type="checkbox" value="Cello" v-model="item[k]">
-                                    Cello</label>
-                                <label><input type="checkbox" value="Violin" v-model="item[k]">
-                                    Violin</label>
-                                <label><input type="checkbox" value="Viola" v-model="item[k]">
-                                    Viola</label>
-                                <label><input type="checkbox" value="Piano" v-model="item[k]">
-                                    Piano</label>
-                            </fieldset>
-                        </div>
-                        <div v-else-if="k === 'availableSlots'">
-                            {{ k }}:
-                            <fieldset>
-                                <div v-for="slot in 5" class="d-inline-block">
-                                    <label><input type="checkbox" v-model="item.availableSlots"
-                                            :value="slot">{{ slot }}</label>
-                                </div>
-                            </fieldset>
-                        </div>
-                        <div v-else>
-                            <div v-if="typeof k === 'number'">
-
-                            </div>
-                            <label>{{ k }}:
-                                <input v-if="typeof v === 'number'" type="number" v-model="item[k]" min="0" max="99">
-                                <input v-else type="text" v-model="item[k]">
-                            </label>
-                        </div>
+                      </fieldset>
                     </div>
-                    <div>
-                        <!-- TODO: button to delete this row -->
-                        <button disabled>Delete</button>
-                    </div>
-                </div>
-                <button v-on:click="addEntry($event, ctype)" class="btn-add">Add Entry</button>
+                  </div>
+                </fieldset>
+              </div>
+              <div v-else-if="k === 'instruments'">
+                {{ k }}:
+                <fieldset>
+                  <label
+                    ><input type="checkbox" value="Cello" v-model="item[k]" />
+                    Cello</label
+                  >
+                  <label
+                    ><input type="checkbox" value="Violin" v-model="item[k]" />
+                    Violin</label
+                  >
+                  <label
+                    ><input type="checkbox" value="Viola" v-model="item[k]" />
+                    Viola</label
+                  >
+                  <label
+                    ><input type="checkbox" value="Piano" v-model="item[k]" />
+                    Piano</label
+                  >
+                </fieldset>
+              </div>
+              <div v-else-if="k === 'availableSlots'">
+                {{ k }}:
+                <fieldset>
+                  <div v-for="slot in 5" class="d-inline-block">
+                    <label
+                      ><input
+                        type="checkbox"
+                        v-model="item.availableSlots"
+                        :value="slot"
+                      />{{ slot }}</label
+                    >
+                  </div>
+                </fieldset>
+              </div>
+              <div v-else>
+                <div v-if="typeof k === 'number'"></div>
+                <label
+                  >{{ k }}:
+                  <input
+                    v-if="typeof v === 'number'"
+                    type="number"
+                    v-model="item[k]"
+                    min="0"
+                    max="99"
+                  />
+                  <input v-else type="text" v-model="item[k]" />
+                </label>
+              </div>
             </div>
-            <!-- Counts of small/medium/large rooms -->
-            <div id="constraints-rooms" class="panel">
-                <div><strong>Rooms</strong></div>
-                <label>
-                    Small (10 students):
-                    <input type="number" v-model.number="constraints2.rooms[0]" min="0" max="99">
-                </label><br>
-                <label>
-                    Medium (10-25 students):
-                    <input type="number" v-model.number="constraints2.rooms[1]" min="0" max="99">
-                </label><br>
-                <label>
-                    Large (25+ students):
-                    <input type="number" v-model.number="constraints2.rooms[2]" min="0" max="99">
-                </label><br>
+            <div>
+              <!-- TODO: button to delete this row -->
+              <button disabled>Delete</button>
             </div>
-
+          </div>
+          <button v-on:click="addEntry($event, ctype)" class="btn-add">
+            Add Entry
+          </button>
         </div>
-
-        <!-- Schedule results page -->
-        <div id='schedule'>
-            <div v-if="scheduleVisible">Schedule is Visible</div>
+        <!-- Counts of small/medium/large rooms -->
+        <div id="constraints-rooms" class="panel">
+          <div><strong>Rooms</strong></div>
+          <label>
+            Small (10 students):
+            <input
+              type="number"
+              v-model.number="constraints2.rooms[0]"
+              min="0"
+              max="99"
+            /> </label
+          ><br />
+          <label>
+            Medium (10-25 students):
+            <input
+              type="number"
+              v-model.number="constraints2.rooms[1]"
+              min="0"
+              max="99"
+            /> </label
+          ><br />
+          <label>
+            Large (25+ students):
+            <input
+              type="number"
+              v-model.number="constraints2.rooms[2]"
+              min="0"
+              max="99"
+            /> </label
+          ><br />
         </div>
+      </div>
 
+      <!-- Schedule results page -->
+      <div id="schedule">
+        <div v-if="scheduleVisible">Schedule is Visible</div>
+      </div>
     </div>
     <script src="app.js"></script>
-</body>
-
+  </body>
 </html>
