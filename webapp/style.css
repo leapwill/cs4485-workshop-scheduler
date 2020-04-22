@@ -102,6 +102,7 @@ button.btn-inverted:hover {
     padding: 8px;
     display: flex;
     justify-content: space-between;
+    flex-wrap: wrap;
 }
 
 .constraint-row label {
@@ -119,4 +120,8 @@ button.btn-inverted:hover {
 
 .d-none {
     display: none;
+}
+
+.flex-break {
+    flex-basis: 100%;
 }

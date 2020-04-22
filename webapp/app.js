@@ -1,7 +1,6 @@
 let app = new Vue({
     el: '#app',
     data: {
-        message: "Hello World!",
         app1Visible: true
     },
     methods: {
@@ -42,7 +41,7 @@ let constraintComponent = new Vue({
     el: '#constraints-app',
     data: {
         constraintsVisible: false,
-        constraints2: {
+        constraints2: { /* TODO remove after refactor from 04-09 email */
             'instructors': [
                 {
                     id: 1000, name: 'Ray Lewis', instruments: [
@@ -82,7 +81,8 @@ let constraintComponent = new Vue({
                 ],
                 availableSlots: [], maxSlots: 0
             },
-            classes: { name: '', id: 2000, isRequired: false, isBookBased: false, bookLevelMin: 1, bookLevelMax: 3, isAgeBased: false, ageMin: 7, ageMax: 10, isInstrumentBased: false, instruments: [], roomSize: 0, enrollmentMax: 10, needsAccompanist: false }
+            classes: { name: '', id: 2000, isRequired: false, isBookBased: false, bookLevelMin: 1, bookLevelMax: 3, isAgeBased: false, ageMin: 7, ageMax: 10, isInstrumentBased: false, instruments: [], roomSize: 0, enrollmentMax: 10, needsAccompanist: false },
+            instructors: { name: '', id: 3000, instruments: [], classes: [] }
         },
         constraints3: {
             workshop_instruments: [
@@ -94,7 +94,8 @@ let constraintComponent = new Vue({
                 { name: 'Cello', isEnabled: false, bookLevelMin: 1, bookLevelMax: 10 }
             ],
             workshop_schedule_slots: 5,
-            classes: []
+            classes: [],
+            instructors: []
         }
     },
     methods: {
@@ -108,12 +109,20 @@ let constraintComponent = new Vue({
             this.constraints3[type].push(newItem);
         },
         deleteEntry: function (e, type, id) {
+            // TODO: ask are you sure
             for (i = 0; i < this.constraints3[type].length; i++) {
                 if (this.constraints3[type][i].id === id) {
                     this.constraints3[type].splice(i, 1);
                     break;
                 }
             }
+        },
+        getClassById: function (id) {
+            this.constraints3.classes.forEach(classitem => {
+                if (classitem.id === id) {
+                    return classitem;
+                }
+            });
         },
         submitCsv: function (e) {
             e.preventDefault();
