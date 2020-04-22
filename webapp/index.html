@@ -208,23 +208,38 @@
                 Can teach the following instruments:
                 <div v-for="inst in constraints3.instructor_instruments">
                   <label>
-                    <input type="checkbox" v-model="inst.isEnabled" />
                     {{ inst.name }}
+                    <input type="checkbox" v-model="inst.isEnabled" />
                   </label>
                 </div>
                 <div v-for="classitem in constraints3.classes">
-                    <label>
-                        {{ classitem.name }}
-                        <input type="checkbox" v-model="instructor.classes" v-bind:value="classitem.id">
-                    </label>
+                  <label>
+                    {{ classitem.name }}
+                    <input
+                      type="checkbox"
+                      v-model="instructor.classes"
+                      v-bind:value="classitem.id"
+                    />
+                  </label>
                 </div>
                 <div v-for="class in instructor.classes">
-                    <div v-if="constraints3.classes[class.id].isBookBased">
-                        <div 
-                         v-for="i in range(constraints3.classes[class.id].bookLevelMin, constraints3.classes[class.id].bookLevelMax)">
-                            {{ i }}: <input type="checkbox" v-model="class.bookLevels" />
-                        </div>
+                  <div v-if="constraints3.classes[class.id].isBookBased">
+                    Can teach class {{ class.id }} with book levels:
+                    <div
+                      v-for="i in range(constraints3.classes[class.id].bookLevelMin, constraints3.classes[class.id].bookLevelMax)"
+                    >
+                      {{ i }}:
+                      <input type="checkbox" v-model="class.bookLevels" />
                     </div>
+                  </div>
+                  <div v-if="constraints3.classes[class.id].isAgeBased">
+                    Can teach class {{ class.id }} with ages:
+                    <div
+                      v-for="i in range(constraints3.classes[class.id].ageMin, constraints3.classes[class.id].ageMax)"
+                    >
+                      {{ i }}: <input type="checkbox" v-model="class.ages" />
+                    </div>
+                  </div>
                 </div>
               </label>
             </div>
