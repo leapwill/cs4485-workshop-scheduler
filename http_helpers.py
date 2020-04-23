@@ -6,6 +6,7 @@ from mimetypes import guess_type
 from urllib.parse import unquote_plus, urlparse
 
 from csv import import_csv
+from gort.gort_types import *
 
 # Nasty little hack to let the stdlib parse the request
 class HTTP_Handler (BaseHTTPRequestHandler):
@@ -188,9 +189,24 @@ class HTTP_Handler (BaseHTTPRequestHandler):
             post_data = self.rfile.read(int(length))
             post_str = standard_b64decode(post_data).decode()
             csv_entries = import_csv(StringIO(post_str))
-            # Print contents to stdout (for now)
+            students = []
+            # Turn into array of Student
             for c in csv_entries:
-                print(c)
+                students.append(Student(
+                    f'{c.fname} {c.lname}',
+                    c.lname,
+                    c.fname,
+                    c.age,
+                    # TODO: instrument
+                    0,
+                    c.book,
+                    # TODO: prefTeach
+                    0
+                ))
+
+            # Print to stdout for now
+            for s in students:
+                print(s)
 
             # Provisionally send 204 No Content
             self.add_response_line(204)

@@ -12,7 +12,9 @@ import re
 # Instrument
 #   * string
 # Book
-#   * string
+#   * int
+#   * Pre-Twinkle = 0
+#   * N = N
 # Violin Book 1 Piece
 #   * string
 #   * possibly empty
@@ -46,7 +48,7 @@ class CSVData:
         self.age = age
         self.instructor = instructor
         self.inst = inst
-        self.book = book
+        self.book = 0 if book == "Pre-Twinkle" else int(book)
         self.book1 = book1
         self.orch = orch
         self.chamber = chamber
