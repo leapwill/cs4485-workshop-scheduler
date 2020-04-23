@@ -1,0 +1,89 @@
+{
+    "workshop_instruments": [
+        {
+            "name": "Piano",
+            "isEnabled": false,
+            "bookLevelMin": 1,
+            "bookLevelMax": 10
+        },
+        {
+            "name": "Harp",
+            "isEnabled": false,
+            "bookLevelMin": 1,
+            "bookLevelMax": 10
+        },
+        {
+            "name": "Accompanist Piano",
+            "isEnabled": false,
+            "bookLevelMin": 1,
+            "bookLevelMax": 10
+        },
+        {
+            "name": "Violin",
+            "isEnabled": true,
+            "bookLevelMin": 1,
+            "bookLevelMax": 10
+        },
+        {
+            "name": "Viola",
+            "isEnabled": true,
+            "bookLevelMin": 1,
+            "bookLevelMax": 10
+        },
+        {
+            "name": "Cello",
+            "isEnabled": true,
+            "bookLevelMin": 1,
+            "bookLevelMax": 10
+        }
+    ],
+    "workshop_schedule_slots": 5,
+    "classes": [
+        {
+            "name": "Group Beginner Violin",
+            "id": 2000,
+            "isRequired": true,
+            "isBookBased": true,
+            "bookLevelMin": 1,
+            "bookLevelMax": 3,
+            "isAgeBased": false,
+            "ageMin": 7,
+            "ageMax": 10,
+            "isInstrumentBased": true,
+            "instruments": [
+                "Violin"
+            ],
+            "roomSize": 0,
+            "enrollmentMax": 10,
+            "needsAccompanist": false
+        },
+        {
+            "name": "Young Dance",
+            "id": 2001,
+            "isRequired": false,
+            "isBookBased": false,
+            "bookLevelMin": 1,
+            "bookLevelMax": 3,
+            "isAgeBased": true,
+            "ageMin": 7,
+            "ageMax": 10,
+            "isInstrumentBased": false,
+            "instruments": [],
+            "roomSize": 2,
+            "enrollmentMax": "20",
+            "needsAccompanist": false
+        }
+    ],
+    "instructors": [ /* NOT FINALIZED */
+        {
+            "name": "Cheryl Stephens",
+            "id": 3000,
+            "instruments": [
+                "Violin"
+            ],
+            "classes": [
+                2000
+            ]
+        }
+    ]
+}
