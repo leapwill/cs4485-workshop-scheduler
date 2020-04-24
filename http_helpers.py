@@ -100,6 +100,44 @@ class HTTP_Handler (BaseHTTPRequestHandler):
         self.response = ''
         self.payload = None
 
+    # Validates the POST headers
+    # Checks for Content-Length header
+    # Checks if the Content-Type matches
+    # Checks if the Content-Encoding matches, default is no encoding
+    def validate_POST_headers (self, type_, encoding=None):
+        # Test for Content-Length header
+        # If missing, send 411 Length Required
+        if self.headers['content-length'] == None:
+            self.generate_html_response(
+                411,
+                'Content-Length required'
+            )
+            self.send_response()
+            return False
+
+        # Test the Content-Type
+        # If incorrect, send 415 Unsupported Media
+        if self.headers['content-type'] != type_:
+            self.generate_html_response(
+                415,
+                f'Unsuported type: {self.headers["content-type"]}'
+            )
+            self.send_response()
+            return False
+
+        # Test the encoding if given
+        # If incorrect encoding, send 422 Unprocessable Entity
+        if encoding != None and self.headers['content-encoding'] != encoding:
+            self.generate_html_response(
+                422,
+                f'Unsuported encoding: {self.headers["content-encoding"]}'
+            )
+            self.send_response()
+            return False
+
+        # All tests passed
+        return True
+
     # Handle incoming GET and HEAD requests, default is GET
     def do_GET (self, is_HEAD=False):
         payload = None
@@ -157,34 +195,8 @@ class HTTP_Handler (BaseHTTPRequestHandler):
         #   Content-Encoding: base64
         #   Content-Length: [length of encoded data]
         if self.parse_result.path == '/post_csv':
-            # Test for Content-Length header
-            # If missing, send 411 Length Required
-            if self.headers['content-length'] == None:
-                self.generate_html_response(
-                    411,
-                    'Content-Length required'
-                )
-                self.send_response()
-                return
-
-            # Test for text/csv type
-            # If incorrect, send 415 Unsupported Media
-            if self.headers['content-type'] != 'text/csv':
-                self.generate_html_response(
-                    415,
-                    f'Unsuported type: {self.headers["content-type"]}'
-                )
-                self.send_response()
-                return
-
-            # Test for base64 encoding
-            # If incorrect encoding, send 422 Unprocessable Entity
-            if self.headers['content-encoding'] != 'base64':
-                self.generate_html_response(
-                    422,
-                    f'Unsuported encoding: {self.headers["content-encoding"]}'
-                )
-                self.send_response()
+            # Validate the headers for CSV data
+            if not self.validate_POST_headers('text/csv', 'base64'):
                 return
 
             length = int(self.headers['content-length'])
@@ -217,26 +229,10 @@ class HTTP_Handler (BaseHTTPRequestHandler):
         #   Content-Type: application/json
         #   Content-Length: [length of JSON data]
         elif self.parse_result.path == '/post_constraints':
-            # Test for Content-Length header
-            # If missing, send 411 Length Required
-            if self.headers['content-length'] == None:
-                self.generate_html_response(
-                    411,
-                    'Content-Length required'
-                )
-                self.send_response()
+            # Validate the headers for JSON data
+            if not self.validate_POST_headers('application/json'):
                 return
 
-            # Test for text/json type
-            # If incorrect, send 415 Unsupported Media
-            if self.headers['content-type'] != 'application/json':
-                self.generate_html_response(
-                    415,
-                    f'Unsuported type: {self.headers["content-type"]}'
-                )
-                self.send_response()
-                return
-            
             # Read the JSON data
             post_json = json.load(self.rfile)
             # Print to stdout for now
