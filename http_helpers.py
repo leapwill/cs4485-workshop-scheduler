@@ -5,6 +5,8 @@ from io import BytesIO, StringIO
 from mimetypes import guess_type
 from urllib.parse import unquote_plus, urlparse
 
+import json
+
 from csv import import_csv
 from gort.gort_types import *
 
@@ -185,8 +187,8 @@ class HTTP_Handler (BaseHTTPRequestHandler):
                 self.send_response()
                 return
 
-            length = self.headers['content-length']
-            post_data = self.rfile.read(int(length))
+            length = int(self.headers['content-length'])
+            post_data = self.rfile.read(length)
             post_str = standard_b64decode(post_data).decode()
             csv_entries = import_csv(StringIO(post_str))
             students = []
@@ -207,6 +209,36 @@ class HTTP_Handler (BaseHTTPRequestHandler):
             # Print to stdout for now
             for s in students:
                 print(s)
+
+            # Provisionally send 204 No Content
+            self.add_response_line(204)
+            self.send_response()
+        # Constraint data passed in
+        #   Content-Type: text/json
+        elif self.parse_result.path == '/post_constraints':
+            # Test for Content-Length header
+            # If missing, send 411 Length Required
+            if self.headers['content-length'] == None:
+                self.generate_html_response(
+                    411,
+                    'Content-Length required'
+                )
+                self.send_response()
+                return
+
+            # Test for text/json type
+            # If incorrect, send 415 Unsupported Media
+            if self.headers['content-type'] != 'application/json':
+                self.generate_html_response(
+                    415,
+                    f'Unsuported type: {self.headers["content-type"]}'
+                )
+                self.send_response()
+                return
+            
+            # Read the JSON data
+            post_json = json.load(self.rfile)
+            print(post_json)
 
             # Provisionally send 204 No Content
             self.add_response_line(204)
@@ -259,6 +291,7 @@ class HTTP_Protocol (Protocol):
         self.webapp_root = webapp_root
         self.data = bytes()
         self.handler = None
+        self.total = 0
 
     # Run every time a connection is made
     def connection_made (self, transport):
@@ -272,7 +305,6 @@ class HTTP_Protocol (Protocol):
         # Append the data recieved
         self.data += bytes(data)
         body_start = self.data.find(b'\r\n\r\n') + 4
-        total = 0
 
         # Set up handler once all the headers have been recieved
         # find() returns -1 if not found, +4 for the entire 4 byte delimiter
@@ -291,10 +323,10 @@ class HTTP_Protocol (Protocol):
             # body_start is the length of the request line + headers
             # Content-Length gives the body length
             cont_len = self.handler.headers['content-length']
-            total = body_start + (int(cont_len) if cont_len else 0)
+            self.total = body_start + (int(cont_len) if cont_len else 0)
 
         # Handle the request once the entire body is recieved
-        if self.handler and len(self.data) >= total:
+        if self.handler and len(self.data) >= self.total:
             self.handler.update_data(self.data, body_start)
             self.handler.handle_one_request()
 
