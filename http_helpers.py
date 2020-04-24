@@ -210,11 +210,12 @@ class HTTP_Handler (BaseHTTPRequestHandler):
             for s in students:
                 print(s)
 
-            # Provisionally send 204 No Content
+            # Send 204 No Content
             self.add_response_line(204)
             self.send_response()
         # Constraint data passed in
-        #   Content-Type: text/json
+        #   Content-Type: application/json
+        #   Content-Length: [length of JSON data]
         elif self.parse_result.path == '/post_constraints':
             # Test for Content-Length header
             # If missing, send 411 Length Required
@@ -238,9 +239,10 @@ class HTTP_Handler (BaseHTTPRequestHandler):
             
             # Read the JSON data
             post_json = json.load(self.rfile)
+            # Print to stdout for now
             print(post_json)
 
-            # Provisionally send 204 No Content
+            # Send 204 No Content
             self.add_response_line(204)
             self.send_response()
         # Invalid target, send 400 Bad Request
