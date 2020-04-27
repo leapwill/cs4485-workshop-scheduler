@@ -53,8 +53,8 @@
             "instruments": [
                 "Violin"
             ],
-            "roomSize": 0,
-            "enrollmentMax": 10,
+            "roomSize": 1,
+            "enrollmentMax": "10",
             "needsAccompanist": false
         },
         {
@@ -79,11 +79,28 @@
             "name": "Cheryl Stephens",
             "id": 3000,
             "instruments": [
-                "Violin"
+                "Violin",
+                "Viola"
             ],
             "classes": [
-                2000
-            ]
+                {
+                    "id": 2000,
+                    "bookLevelMin": 1,
+                    "bookLevelMax": 3
+                }
+            ],
+            "slotsAvailable": [
+                1,
+                2,
+                5,
+                4
+            ],
+            "slotsMax": 3
         }
+    ],
+    "rooms": [
+        10,
+        5,
+        2
     ]
 }

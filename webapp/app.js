@@ -52,7 +52,7 @@ let constraintComponent = new Vue({
                 availableSlots: [], maxSlots: 0
             },
             classes: { name: '', id: 2000, isRequired: false, isBookBased: false, bookLevelMin: 1, bookLevelMax: 3, isAgeBased: false, ageMin: 7, ageMax: 10, isInstrumentBased: false, instruments: [], roomSize: 0, enrollmentMax: 10, needsAccompanist: false },
-            instructors: { name: '', id: 3000, instruments: [], classes: [] }
+            instructors: { name: '', id: 3000, instruments: [], classes: [], slotsAvailable: [], slotsMax: 5 }
         },
         constraints3: {
             workshop_instruments: [
@@ -80,20 +80,24 @@ let constraintComponent = new Vue({
             this.constraints3[type].push(newItem);
         },
         deleteEntry: function (e, type, id) {
-            // TODO: ask are you sure
-            for (i = 0; i < this.constraints3[type].length; i++) {
-                if (this.constraints3[type][i].id === id) {
-                    this.constraints3[type].splice(i, 1);
-                    break;
+            // TODO: find and delete references (like instructor classes)
+            if (confirm('Are you sure you want to delete this?')) {
+                for (i = 0; i < this.constraints3[type].length; i++) {
+                    if (this.constraints3[type][i].id === id) {
+                        this.constraints3[type].splice(i, 1);
+                        break;
+                    }
                 }
             }
         },
-        getClassById: function (id) {
-            this.constraints3.classes.forEach(classitem => {
-                if (classitem.id === id) {
-                    return classitem;
-                }
-            });
+        instructorClassChanged: function (e, classes, id) {
+            if (e.target.checked === true) {
+                classes.push({ id: id });
+            }
+            else {
+                let clsToRemove = classes.find(cls => cls.id === id);
+                classes.splice(classes.indexOf(clsToRemove), 1);
+            }
         },
         submitCsv: function (e) {
             e.preventDefault();

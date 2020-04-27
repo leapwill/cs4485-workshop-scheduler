@@ -143,32 +143,54 @@
               </div>
             </fieldset>
           </span>
+          <!-- Instructor classes -->
           <div class="flex-break">
             Can teach the following classes:
             <fieldset>
               <div v-for="classitem in constraints3.classes">
                 <label>
                   {{ classitem.name }}
-                  <input type="checkbox" v-model="instructor.classes" :value="classitem.id" />
+                  <input type="checkbox" v-on:change="instructorClassChanged($event, instructor.classes, classitem.id)"
+                    :value="instructor.classes.find(cls=>cls.id===classitem.id)" />
                 </label>
               </div>
-              <div v-for="classid in instructor.classes">
-                <div v-if="getClassById(classid).isBookBased">
-                  Can teach class {{ classid }} with book levels:
-                  <div v-for="i in range(getClassById(classid).bookLevelMin, getClassById(classid).bookLevelMax)">
-                    {{ i }}:
-                    <input type="checkbox" v-model="classitem.bookLevels" /> <!-- TODO: figure out model for these -->
-                  </div>
+              <!-- TODO: nest this above, otherwise it's out of order and doesn't make sense -->
+              <div v-for="classobj in instructor.classes">
+                <div v-if="constraints3.classes.find(cls=>cls.id===classobj.id).isBookBased">
+                  Can teach class with book levels:
+                  <label>Lowest: <input type="number" v-model.number="classobj.bookLevelMin"
+                      :min="constraints3.classes.find(cls=>cls.id===classobj.id).bookLevelMin"
+                      :max="classobj.bookLevelMax" /></label>
+                  <label>Highest: <input type="number" v-model.number="classobj.bookLevelMax"
+                      :min="classobj.bookLevelMin"
+                      :max="constraints3.classes.find(cls=>cls.id===classobj.id).bookLevelMax" /></label>
+                  <!-- TODO: figure out model for these -->
                 </div>
-                <div v-if="getClassById(classid).isAgeBased">
-                  Can teach class {{ classid }} with ages:
-                  <div v-for="i in range(getClassById(classid).ageMin, getClassById(classid).ageMax)">
-                    {{ i }}: <input type="checkbox" v-model="classitem.ages" />
-                  </div>
+                <div v-if="constraints3.classes.find(cls=>cls.id===classobj.id).isAgeBased">
+                  Can teach class with ages:
+                  <label>Lowest: <input type="number" v-model.number="classobj.ageMin"
+                      :min="constraints3.classes.find(cls=>cls.id===classobj.id).ageMin"
+                      :max="classobj.ageMax" /></label>
+                  <label>Highest: <input type="number" v-model.number="classobj.ageMax" :min="classobj.ageMin"
+                      :max="constraints3.classes.find(cls=>cls.id===classobj.id).ageMax" /></label>
                 </div>
               </div>
             </fieldset>
           </div>
+          <div>
+            Can teach in these slots:
+            <label v-for="i in constraints3.workshop_schedule_slots">
+              <input type="checkbox" v-model="instructor.slotsAvailable" :value="i" /> {{i}}
+            </label>
+          </div>
+          <div>
+            <label>
+              Can teach this many slots total:
+              <input type="number" v-model.number="instructor.slotsMax" min="1"
+                max="instructor.slotsAvailable.length" />
+            </label>
+          </div>
+
         </div>
         <button v-on:click="addEntry($event, 'instructors')" class="btn-add">
           Add Instructor
