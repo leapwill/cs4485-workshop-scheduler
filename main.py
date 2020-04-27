@@ -17,6 +17,8 @@ async def main():
     loop = aio.get_running_loop()
     server = await loop.create_server(lambda: HTTP_Protocol(webapp_root),
                                       hostname, port, start_serving=False)
+    # TODO: open system's default browser?
+    print(f'Open the website at http://{hostname}:{port}')
 
     # Begin accepting connections
     # `async with` block automatically handles cleanup on close
