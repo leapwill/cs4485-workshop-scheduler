@@ -41,36 +41,6 @@ let constraintComponent = new Vue({
     el: '#constraints-app',
     data: {
         constraintsVisible: false,
-        constraints2: { /* TODO remove after refactor from 04-09 email */
-            'instructors': [
-                {
-                    id: 1000, name: 'Ray Lewis', instruments: [
-                        { name: 'Violin', canTeach: true, bookLevels: [2, 3, 4] },
-                        { name: 'Viola', canTeach: true, bookLevels: [6, 7] },
-                        { name: 'Cello', canTeach: false, bookLevels: [] },
-                        { name: 'Piano', canTeach: false, bookLevels: [] }
-                    ],
-                    availableSlots: [1, 2, 3, 4, 5], maxSlots: 5
-                },
-                {
-                    id: 1001, name: 'Catherine Adkins', instruments: [
-                        { name: 'Violin', canTeach: false, bookLevels: [] },
-                        { name: 'Viola', canTeach: false, bookLevels: [] },
-                        { name: 'Cello', canTeach: true, bookLevels: [1, 2, 3, 4, 5] },
-                        { name: 'Piano', canTeach: false, bookLevels: [] }
-                    ],
-                    availableSlots: [3, 4, 5], maxSlots: 2
-                },
-            ],
-            'classtypes': [
-                { type: 'Master Class', instruments: [], count: 0 },
-                { type: 'Workshop', instruments: [], count: 0 },
-                { type: 'Chamber Orchestra', count: 0 },
-                { type: 'Elective Art', count: 0 },
-                { type: 'Elective Composition', count: 0 }
-            ],
-            'rooms': [10, 5, 2] /* small, medium, large */
-        },
         defaults: {
             instructors: {
                 id: 9999, name: '', instruments: [
@@ -95,7 +65,8 @@ let constraintComponent = new Vue({
             ],
             workshop_schedule_slots: 5,
             classes: [],
-            instructors: []
+            instructors: [],
+            'rooms': [10, 5, 2] /* small, medium, large */
         }
     },
     methods: {
