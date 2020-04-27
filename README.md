@@ -9,12 +9,13 @@
  * Netcat (or equivalent)
 
 ## Testing
-To test with the default hostname and port of `127.0.0.1:8080`
+After running the server, to test with the default hostname and port of
+`127.0.0.1:8080` do
 ```bash
 bash test_requests.sh
 ```
 
-or to provide a different hostname and port to use
+or to provide a different hostname and port to use, do:
 ```bash
 bash test_requests.sh [hostname] [port]
 ```
