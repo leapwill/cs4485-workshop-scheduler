@@ -85,6 +85,11 @@ button.btn-inverted:hover {
     margin-right: auto;
 }
 
+.form-status {
+    padding: 4px;
+    margin-top: 2px;
+}
+
 .form-status.success {
     border: 2px solid green;
 }
@@ -110,8 +115,12 @@ button.btn-inverted:hover {
     margin-right: 24px;
 }
 
-.btn-add {
-    margin-top: 8px;
+button.btn-add {
+    display: block;
+}
+
+button {
+    margin: 8px 0 0 0;
 }
 
 .d-inline-block {
