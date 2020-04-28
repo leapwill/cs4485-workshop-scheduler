@@ -126,6 +126,7 @@
           Add Class
         </button>
       </div>
+      <!-- Instructors -->
       <div class="panel">
         <strong>Instructors in this workshop</strong>
         <div v-for="instructor in constraints3.instructors" class="constraint-row">
@@ -135,12 +136,10 @@
           <span>
             Can teach the following instruments:
             <fieldset>
-              <div v-for="inst in constraints3.workshop_instruments" v-if="inst.isEnabled === true">
-                <label>
-                  {{ inst.name }}
-                  <input type="checkbox" v-model="instructor.instruments" :value="inst.name" />
-                </label>
-              </div>
+              <label v-for="inst in constraints3.workshop_instruments" v-if="inst.isEnabled === true">
+                {{ inst.name }}
+                <input type="checkbox" v-model="instructor.instruments" :value="inst.name" />
+              </label>
             </fieldset>
           </span>
           <!-- Instructor classes -->
@@ -153,27 +152,30 @@
                   <input type="checkbox" v-on:change="instructorClassChanged($event, instructor.classes, classitem.id)"
                     :value="instructor.classes.find(cls=>cls.id===classitem.id)" />
                 </label>
-              </div>
-              <!-- TODO: nest this above, otherwise it's out of order and doesn't make sense -->
-              <div v-for="classobj in instructor.classes">
-                <div v-if="constraints3.classes.find(cls=>cls.id===classobj.id).isBookBased">
-                  Can teach class with book levels:
-                  <label>Lowest: <input type="number" v-model.number="classobj.bookLevelMin"
-                      :min="constraints3.classes.find(cls=>cls.id===classobj.id).bookLevelMin"
-                      :max="classobj.bookLevelMax" /></label>
-                  <label>Highest: <input type="number" v-model.number="classobj.bookLevelMax"
-                      :min="classobj.bookLevelMin"
-                      :max="constraints3.classes.find(cls=>cls.id===classobj.id).bookLevelMax" /></label>
-                  <!-- TODO: figure out model for these -->
-                </div>
-                <div v-if="constraints3.classes.find(cls=>cls.id===classobj.id).isAgeBased">
-                  Can teach class with ages:
-                  <label>Lowest: <input type="number" v-model.number="classobj.ageMin"
-                      :min="constraints3.classes.find(cls=>cls.id===classobj.id).ageMin"
-                      :max="classobj.ageMax" /></label>
-                  <label>Highest: <input type="number" v-model.number="classobj.ageMax" :min="classobj.ageMin"
-                      :max="constraints3.classes.find(cls=>cls.id===classobj.id).ageMax" /></label>
-                </div>
+                <fieldset v-if="instructor.classes.find(cls=>cls.id===classitem.id) !== undefined">
+                  <div v-if="classitem.isBookBased">
+                    Can teach class with book levels:
+                    <label>Lowest: <input type="number"
+                        v-model.number="instructor.classes.find(cls=>cls.id===classitem.id).bookLevelMin"
+                        :min="classitem.bookLevelMin"
+                        :max="instructor.classes.find(cls=>cls.id===classitem.id).bookLevelMax" /></label>
+                    <label>Highest: <input type="number"
+                        v-model.number="instructor.classes.find(cls=>cls.id===classitem.id).bookLevelMax"
+                        :min="instructor.classes.find(cls=>cls.id===classitem.id).bookLevelMin"
+                        :max="classitem.bookLevelMax" /></label>
+                  </div>
+                  <div v-if="classitem.isAgeBased">
+                    Can teach class with ages:
+                    <label>Lowest: <input type="number"
+                        v-model.number="instructor.classes.find(cls=>cls.id===classitem.id).ageMin"
+                        :min="classitem.ageMin"
+                        :max="instructor.classes.find(cls=>cls.id===classitem.id).ageMax" /></label>
+                    <label>Highest: <input type="number"
+                        v-model.number="instructor.classes.find(cls=>cls.id===classitem.id).ageMax"
+                        :min="instructor.classes.find(cls=>cls.id===classitem.id).ageMin"
+                        :max="classitem.ageMax" /></label>
+                  </div>
+                </fieldset>
               </div>
             </fieldset>
           </div>
