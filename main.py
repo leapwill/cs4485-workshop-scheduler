@@ -22,14 +22,17 @@ async def main ():
     server = await loop.create_server(lambda: HTTP_Protocol(webapp_root),
                                       hostname, port, start_serving=False)
     start_server = aio.create_task(server.serve_forever())
-    start_browser = aio.create_task(open_browser(hostname, port))
+    start_browser = None
+    # Open the page if '--no-browser' is not passed in
+    if len(sys.argv) == 1 or sys.argv[1] != '--no-browser':
+        start_browser = aio.create_task(open_browser(hostname, port))
 
     print(f'Open the website at http://{hostname}:{port}')
 
     # Begin accepting connections
     await start_server
-    # Open the page
-    await start_browser
+    if start_browser != None:
+        await start_browser
 
 if __name__ == '__main__':
     if sys.version_info >= (3, 7):

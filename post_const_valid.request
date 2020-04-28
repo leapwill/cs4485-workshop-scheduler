@@ -1,7 +1,7 @@
 POST /post_constraints HTTP/1.1
 Host: 127.0.0.1
 Content-Type: application/json
-Content-Length: 2268
+Content-Length: 2638
 
 {
     "workshop_instruments": [
@@ -58,8 +58,8 @@ Content-Length: 2268
             "instruments": [
                 "Violin"
             ],
-            "roomSize": 0,
-            "enrollmentMax": 10,
+            "roomSize": 1,
+            "enrollmentMax": "10",
             "needsAccompanist": false
         },
         {
@@ -84,11 +84,28 @@ Content-Length: 2268
             "name": "Cheryl Stephens",
             "id": 3000,
             "instruments": [
-                "Violin"
+                "Violin",
+                "Viola"
             ],
             "classes": [
-                2000
-            ]
+                {
+                    "id": 2000,
+                    "bookLevelMin": 1,
+                    "bookLevelMax": 3
+                }
+            ],
+            "slotsAvailable": [
+                1,
+                2,
+                5,
+                4
+            ],
+            "slotsMax": 3
         }
+    ],
+    "rooms": [
+        10,
+        5,
+        2
     ]
 }
