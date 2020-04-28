@@ -37,7 +37,7 @@ let app = new Vue({
 });
 
 let constraintComponent = new Vue({
-    // TODO: fetch existing constraints from server and fill in
+    // TODO: fetch existing constraints from server and fill in (persistence stored by server)
     el: '#constraints-app',
     data: {
         constraintsVisible: false,
@@ -103,31 +103,16 @@ let constraintComponent = new Vue({
             e.preventDefault();
             const file = document.querySelector('form#form-csv input[type="file"]').files[0];
             const reader = new FileReader();
-            const xhr = new XMLHttpRequest();
-            const statusEl = document.querySelector('form#form-csv div.form-status');
-            xhr.addEventListener('load', () => {
-                // TODO: refactor to fetch() and use setFormStatus()
-                if (Math.floor(xhr.status / 100) === 2) {
-                    statusEl.classList.add('success');
-                    statusEl.textContent = 'CSV upload succeeded';
-                }
-                else {
-                    statusEl.classList.add('error');
-                    statusEl.textContent = 'CSV upload failed: ' + xhr.statusText;
-                    console.error(xhr);
-                }
-            });
-            xhr.upload.addEventListener('error', (e) => {
-                statusEl.classList.add('error');
-                statusEl.textContent = 'CSV upload failed: ' + e.message;
-                console.error(e);
-            });
-            xhr.open('POST', 'post_csv');
-            xhr.overrideMimeType('text/plain');
-            xhr.setRequestHeader('Content-Type', 'text/csv');
-            xhr.setRequestHeader('Content-Encoding', 'base64');
+            // using ugly old syntax because FileReader is old and doesn't use Promises
             reader.addEventListener('load', (e) => {
-                xhr.send(btoa(e.target.result));
+                fetch('post_csv', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'text/csv', 'Content-Encoding': 'base64' },
+                    body: btoa(e.target.result)
+                }).then(response => {
+                    const statusEl = document.querySelector('form#form-csv div.form-status')
+                    this.setFormStatus(statusEl, response);
+                })
             });
             reader.readAsBinaryString(file);
         },
