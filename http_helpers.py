@@ -252,6 +252,12 @@ class HTTP_Handler (BaseHTTPRequestHandler):
                       x['needsAccompanist'])
                 for x in post_json['classes']
             ]
+            # Get the instructors from the JSON data
+            instructors = [
+                Instructor(x['name'], x['id'], x['instruments'], x['classes'],
+                           x['slotsAvailable'], x['slotsMax'])
+                for x in post_json['instructors']
+            ]
 
             # Print to stdout for now
             print('Instruments\n-----------')
@@ -261,6 +267,9 @@ class HTTP_Handler (BaseHTTPRequestHandler):
             print('Classes\n-------')
             for c in classes:
                 print(c)
+            print('Instructors\n-----------')
+            for i in instructors:
+                print(i)
 
             # Send 204 No Content
             self.add_response_line(204)

@@ -65,7 +65,7 @@ class Class:
             f'\tNeeds accompanist: '
             + ('Yes\n' if self.need_accompanist else 'No\n')
             + f'\tStudents:\n'
-            + ('\n'.join(self.students) if self.students else '\t\tNone\n')
+            + ('\n'.join(self.students) if self.students else '\t\tNone')
         )
 
     # TODO
@@ -77,6 +77,35 @@ class Class:
     # Add a student to the list of students
     def add_student (self, student):
         pass
+
+class Instructor:
+    def __init__ (self, name, id_, instruments, can_teach, avail, max_slots):
+        self.name = name
+        self.id = id_
+        self.instruments = instruments
+        self.can_teach = [
+            (x['id'], x['bookLevelMin'], x['bookLevelMax'])
+            for x in can_teach
+        ]
+        self.avail = avail
+        self.max_slots = max_slots
+
+    def __str__ (self):
+        return (
+            f'{self.name} ({self.id}):\n'
+            f'\tInstruments: '
+            + (' '.join(self.instruments)) + '\n'
+            + f'\tCan teach:\n'
+            + ('\n'.join([
+                  f'\t\tID: {x[0]}\n'
+                  f'\t\tMinimum level: {x[1]}\n'
+                  f'\t\tMaximum level: {x[2]}'
+                  for x in self.can_teach
+              ]) + '\n')
+            + f'\tSlots available: '
+            + (' '.join([str(x) for x in self.avail]) + '\n')
+            + f'\tMaximum slots: {self.max_slots}'
+        )
 
 class Student:
     fullName = ""
@@ -110,20 +139,3 @@ class Student:
 
     def setMasterClass (self, ID):
         self.masterClassId = ID
-
-class Teacher:
-    fullName = ""
-    agePref = 0
-    classPref = 0
-    instrument = 0
-    #timeAvai = 0
-    booksCertfied = []
-    classesCertified = []
-
-    def __init__ (self, full,age,cpref,inst,bcert,ccert):
-        self.fullName = full
-        self.agePref = age
-        self.classPref = cpref
-        self.instrument = inst
-        self.booksCertfied = bcert
-        self.classesCertified = ccert
