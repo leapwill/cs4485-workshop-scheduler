@@ -1,8 +1,8 @@
 # cs4485-workshop-scheduler
 
 ## System Requirements
- - Python 3.7+  
- - Google OR-Tools
+ - [Python 3.7+ ](https://www.python.org/downloads/)
+ - [Google OR-Tools](https://developers.google.com/optimization/install)
 
 ## Testing Requirements
  * Bash (or equivalent)
@@ -19,6 +19,3 @@ or to provide a different hostname and port to use, do:
 ```bash
 bash test_requests.sh [hostname] [port]
 ```
-
-## Code Standards
-PEP 8, especially [naming conventions](https://www.python.org/dev/peps/pep-0008/#naming-conventions).
