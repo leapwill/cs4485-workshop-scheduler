@@ -241,10 +241,26 @@ class HTTP_Handler (BaseHTTPRequestHandler):
                 for x in post_json['workshop_instruments']
                 if x['isEnabled']
             ]
+            # Get the number of schedule slots from the JSON data
+            slots = post_json['workshop_schedule_slots']
+            # Get the classes from the JSON data
+            classes = [
+                Class(x['name'], x['id'], x['isRequired'], x['isBookBased'],
+                      x['bookLevelMin'], x['bookLevelMax'], x['isAgeBased'],
+                      x['ageMin'], x['ageMax'], x['isInstrumentBased'],
+                      x['instruments'], x['roomSize'], x['enrollmentMax'],
+                      x['needsAccompanist'])
+                for x in post_json['classes']
+            ]
+
             # Print to stdout for now
             print('Instruments\n-----------')
             for i in instruments:
                 print(i)
+            print(f'Slots: {slots}')
+            print('Classes\n-------')
+            for c in classes:
+                print(c)
 
             # Send 204 No Content
             self.add_response_line(204)

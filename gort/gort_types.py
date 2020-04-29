@@ -11,23 +11,72 @@ class Instrument:
             f'\tMaximum level: {self.max}'
         )
 
-class instClass:
-    ClassID = 0
-    ClassType = 0
-    Instrument = 0
-    MaxSize = 0
-    Instructor = 0
-    Students = []
+class Class:
+    def __init__ (self, name, id_, required, book_based, min_book, max_book,
+                  age_based, min_age, max_age, instrument_based, instruments,
+                  size, max_enroll, need_accompanist):
+        self.name = name
+        self.id = id_
+        self.required = required
+        self.book_based = book_based
+        self.min_book = min_book
+        self.max_book = max_book
+        self.age_based = age_based
+        self.min_age = min_age
+        self.max_age = max_age
+        self.instrument_based = instrument_based
+        self.instruments = instruments
+        self.size = size
+        self.max_enroll = max_enroll
+        self.need_accompanist = need_accompanist
+        # Initialize with no instructor or students
+        self.instructor = 0
+        self.students = []
 
-    def __init__ (self, classIdCounter, classType, instrument, maxSize):
-        #intializes previous variables.
-        self.ClassID = classIdCounter
-        self.ClassType = classType
-        self.Instrument = instrument
-        self.MaxSize = maxSize
+    def __str__ (self):
+        return (
+            f'{self.name} ({self.id}):\n'
+            f'\tInstructor: '
+            + (f'{self.instructor}\n' if self.instructor else 'None\n')
+            + f'\tRequired: '
+            + ('Yes\n' if self.required else 'No\n')
+            + f'\tBook based: '
+            + ('Yes\n' if self.book_based else 'No\n')
+            + (f'\t\tMinimum level: {self.min_book}\n'
+               if self.book_based else '')
+            + (f'\t\tMaximum level: {self.max_book}\n'
+               if self.book_based else '')
+            + f'\tAge based: '
+            + ('Yes\n' if self.age_based else 'No\n')
+            + (f'\t\tMinimum age: {self.min_age}\n'
+               if self.age_based else '')
+            + (f'\t\tMaximum age: {self.max_age}\n'
+               if self.age_based else '')
+            + f'\tInstrument based: '
+            + ('Yes\n' if self.instrument_based else 'No\n')
+            + ('\tInstruments: ' if self.instrument_based else '')
+            + (' '.join(self.instruments) + '\n'
+               if self.instrument_based else '')
+            + f'\tRoom size: '
+            + ('Small\n' if self.size == 1
+               else 'Medium\n' if self.size == 2
+               else 'Large\n')
+            + f'\tMax students: {self.max_enroll}\n'
+            f'\tNeeds accompanist: '
+            + ('Yes\n' if self.need_accompanist else 'No\n')
+            + f'\tStudents:\n'
+            + ('\n'.join(self.students) if self.students else '\t\tNone\n')
+        )
 
-    def setInstructor (self, instr):
-        self.Instructor = instr
+    # TODO
+    # Set the instructor for the class
+    def set_instructor (self, instructor):
+        pass
+
+    # TODO
+    # Add a student to the list of students
+    def add_student (self, student):
+        pass
 
 class Student:
     fullName = ""
