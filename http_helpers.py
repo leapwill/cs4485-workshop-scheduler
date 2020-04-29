@@ -258,6 +258,10 @@ class HTTP_Handler (BaseHTTPRequestHandler):
                            x['slotsAvailable'], x['slotsMax'])
                 for x in post_json['instructors']
             ]
+            # Get the number of each room from the JSON data
+            rooms = (post_json['rooms'][0],
+                     post_json['rooms'][1],
+                     post_json['rooms'][2])
 
             # Print to stdout for now
             print('Instruments\n-----------')
@@ -270,6 +274,12 @@ class HTTP_Handler (BaseHTTPRequestHandler):
             print('Instructors\n-----------')
             for i in instructors:
                 print(i)
+            print('Rooms\n-----')
+            print(
+                f'Small rooms: {rooms[0]}\n'
+                f'Medium rooms: {rooms[1]}\n'
+                f'Large rooms: {rooms[2]}'
+            )
 
             # Send 204 No Content
             self.add_response_line(204)
