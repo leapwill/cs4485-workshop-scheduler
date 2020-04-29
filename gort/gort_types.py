@@ -1,3 +1,16 @@
+class Instrument:
+    def __init__ (self, name, min_, max_):
+        self.name = name
+        self.min = min_
+        self.max = max_
+
+    def __str__ (self):
+        return (
+            f'{self.name}:\n'
+            f'\tMinimum level: {self.min}\n'
+            f'\tMaximum level: {self.max}'
+        )
+
 class instClass:
     ClassID = 0
     ClassType = 0

@@ -235,8 +235,16 @@ class HTTP_Handler (BaseHTTPRequestHandler):
 
             # Read the JSON data
             post_json = json.load(self.rfile)
+            # Gather the instruments from the JSON data
+            instruments = [
+                Instrument(x['name'], x['bookLevelMin'], x['bookLevelMax'])
+                for x in post_json['workshop_instruments']
+                if x['isEnabled']
+            ]
             # Print to stdout for now
-            print(post_json)
+            print('Instruments\n-----------')
+            for i in instruments:
+                print(i)
 
             # Send 204 No Content
             self.add_response_line(204)
