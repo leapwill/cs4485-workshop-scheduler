@@ -131,3 +131,6 @@ dmypy.json
 # Vim
 *.swp
 *.vim
+
+# Ignore .dat files
+*.dat
