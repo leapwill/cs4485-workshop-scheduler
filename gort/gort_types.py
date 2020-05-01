@@ -1,3 +1,11 @@
+# Data given in constraint JSON
+
+# Instrument name
+#   * string
+# Minimum book level
+#   * int
+# Maximum book level
+#   * int
 class Instrument:
     def __init__ (self, name, min_, max_):
         self.name = name
@@ -11,6 +19,37 @@ class Instrument:
             f'\tMaximum level: {self.max}'
         )
 
+# Class name
+#   * string
+# Class ID
+#   * int
+# Required class
+#   * boolean
+# Book based
+#   * boolean
+# Minimum book level
+#   * int
+# Maximum book level
+#   * int
+# Age based
+#   * boolean
+# Minimum age
+#   * int
+# Maximum age
+#   * int
+# Instrument based
+#   * boolean
+# Instrument list
+#   * list(string)
+# Room size
+#   * int
+#   * small = 1
+#   * medium = 2
+#   * large = 3
+# Enrollment max
+#   * int
+# Needs accompanist
+#   * boolean
 class Class:
     def __init__ (self, name, id_, required, book_based, min_book, max_book,
                   age_based, min_age, max_age, instrument_based, instruments,
@@ -78,6 +117,21 @@ class Class:
     def add_student (self, student):
         pass
 
+# Instructor name
+#   * string
+# Instructor ID
+#   * int
+# List of instruments
+#   * list(string)
+# List of teachable classes
+#   * list((class id, minimmum level, maximum level))
+#   ** class id: int
+#   ** minimum level: int
+#   ** maximum level: int
+# Slots available for
+#   * list(int)
+# Maximum slots available for
+#   * int
 class Instructor:
     def __init__ (self, name, id_, instruments, can_teach, avail, max_slots):
         self.name = name
