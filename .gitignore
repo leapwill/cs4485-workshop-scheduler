@@ -132,5 +132,5 @@ dmypy.json
 *.swp
 *.vim
 
-# Ignore .dat files
-*.dat
+# Ignore previous.json
+previous.json

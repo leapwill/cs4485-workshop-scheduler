@@ -264,7 +264,7 @@ class HTTP_Handler (BaseHTTPRequestHandler):
                      post_json['rooms'][2])
 
             # Save the JSON in previous_json.dat
-            save_name = f'{self.webapp_root}/previous_json.dat'
+            save_name = f'{self.webapp_root}/previous.json'
             print(f'Saving constraints to \'{save_name}\'')
             save = open(save_name, 'w')
             save.write(json.dumps(post_json))
