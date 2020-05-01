@@ -127,7 +127,9 @@ class Class:
 #   * list((class id, minimmum level, maximum level))
 #   ** class id: int
 #   ** minimum level: int
+#   ** -1 = no minimum level needed
 #   ** maximum level: int
+#   ** -1 = no maximum level needed
 # Slots available for
 #   * list(int)
 # Maximum slots available for
@@ -138,7 +140,11 @@ class Instructor:
         self.id = id_
         self.instruments = instruments
         self.can_teach = [
-            (x['id'], x['bookLevelMin'], x['bookLevelMax'])
+            (
+                x['id'],
+                x['bookLevelMin'] if 'bookLevelMin' in x else -1,
+                x['bookLevelMax'] if 'bookLevelMax' in x else -1
+            )
             for x in can_teach
         ]
         self.avail = avail
