@@ -51,7 +51,6 @@ let app = new Vue({
 });
 
 let constraintComponent = new Vue({
-    // TODO: fetch existing constraints from server and fill in (persistence stored by server)
     el: '#constraints-app',
     data: {
         constraintsVisible: false,
@@ -157,7 +156,9 @@ let constraintComponent = new Vue({
     },
     mounted: function () {
         this.loadConstraintsPromise.then(response => {
-            response.json().then(json => this.constraints3 = json);
+            if (Math.floor(response.status / 100) === 2) {
+                response.json().then(json => this.constraints3 = json);
+            }
         });
     }
 });
