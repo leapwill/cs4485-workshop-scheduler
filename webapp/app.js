@@ -55,6 +55,7 @@ let constraintComponent = new Vue({
     el: '#constraints-app',
     data: {
         constraintsVisible: false,
+        loadConstraintsPromise: null,
         defaults: {
             instructors: {
                 id: 9999, name: '', instruments: [
@@ -150,6 +151,14 @@ let constraintComponent = new Vue({
                 console.error(response);
             }
         }
+    },
+    created: function () {
+        this.loadConstraintsPromise = fetch('/previous.json');
+    },
+    mounted: function () {
+        this.loadConstraintsPromise.then(response => {
+            response.json().then(json => this.constraints3 = json);
+        });
     }
 });
 
