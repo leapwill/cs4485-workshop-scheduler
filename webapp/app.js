@@ -1,3 +1,17 @@
+Vue.component('back-button', {
+    data: function () {
+        return {
+            goBack: function () {
+                constraintComponent.constraintsVisible = false;
+                scheduleComponent.scheduleVisible = false;
+                window.location.hash = '';
+                app.app1Visible = true;
+            }
+        }
+    },
+    template: '<div><button v-on:click="goBack()">← Back</button></div>'
+});
+
 let app = new Vue({
     el: '#app',
     data: {
@@ -140,7 +154,7 @@ let constraintComponent = new Vue({
 });
 
 let scheduleComponent = new Vue({
-    el: '#schedule',
+    el: '#schedule-app',
     data: {
         scheduleVisible: false
     }

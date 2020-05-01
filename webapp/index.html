@@ -37,6 +37,7 @@
     </div>
     <!-- Constraints input page -->
     <div id="constraints-app" v-if="constraintsVisible">
+      <back-button></back-button>
       <form v-on:submit="submitCsv" id="form-csv" class="panel">
         <div><strong>Student Data CSV</strong></div>
         <input type="file" accept=".csv" />
@@ -151,7 +152,8 @@
                   <input type="checkbox" v-on:change="instructorClassChanged($event, instructor.classes, classitem.id)"
                     :value="instructor.classes.find(cls=>cls.id===classitem.id)" />
                 </label>
-                <fieldset v-if="instructor.classes.find(cls=>cls.id===classitem.id) !== undefined">
+                <fieldset
+                  v-if="instructor.classes.find(cls=>cls.id===classitem.id) !== undefined && (classitem.isBookBased || classitem.isAgeBased)">
                   <div v-if="classitem.isBookBased">
                     Can teach class with book levels:
                     <label>Lowest: <input type="number"
@@ -217,8 +219,9 @@
     </div>
 
     <!-- Schedule results page -->
-    <div id="schedule">
-      <div v-if="scheduleVisible">Schedule is Visible</div>
+    <div id="schedule-app" v-if="scheduleVisible">
+      <back-button></back-button>
+      <div>Schedule is Visible</div>
     </div>
   </div>
   <script src="app.js"></script>
