@@ -149,10 +149,9 @@
               <div v-for="classitem in constraints3.classes">
                 <label>
                   {{ classitem.name }}
-                  <input type="checkbox" v-on:change="instructorClassChanged($event, instructor.classes, classitem.id)"
-                    :value="instructor.classes.find(cls=>cls.id===classitem.id)" />
+                  <input type="checkbox" v-on:change="instructorClassChanged($event, instructor, classitem.id)"
+                    :checked="instructor.classes.find(cls=>cls.id===classitem.id) !== undefined" />
                 </label>
-                <!-- TODO FIXME: multiple instructors share one instructor.classes object -->
                 <fieldset
                   v-if="instructor.classes.find(cls=>cls.id===classitem.id) !== undefined && (classitem.isBookBased || classitem.isAgeBased)">
                   <div v-if="classitem.isBookBased">

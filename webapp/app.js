@@ -85,8 +85,7 @@ let constraintComponent = new Vue({
     },
     methods: {
         addEntry: function (e, type) {
-            let newItem = {};
-            newItem = Object.assign(newItem, this.defaults[type])
+            let newItem = JSON.parse(JSON.stringify(this.defaults[type])); // deep copy without lodash
             if (this.constraints3[type].length !== 0) {
                 let nextId = this.constraints3[type][this.constraints3[type].length - 1].id + 1;
                 newItem.id = nextId;
@@ -104,7 +103,8 @@ let constraintComponent = new Vue({
                 }
             }
         },
-        instructorClassChanged: function (e, classes, id) {
+        instructorClassChanged: function (e, instructor, id) {
+            let classes = instructor.classes;
             if (e.target.checked === true) {
                 classes.push({ id: id });
             }
