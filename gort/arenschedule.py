@@ -148,6 +148,20 @@ def main():
             for s in all_slots:
                 classAttendance[k, c, s] = model.NewBoolVar('classAttendance%i_%i_%i' % (k, c, s))
 
+    #*
+    #one Group class
+    #for k in all_kids:
+    ##    for c in all_classes:
+     #       if classInfo[c][2] == 0:
+     #           model.Add(sum(classAttendance[k,c,s] for s in all_slots) == 1)
+
+    #one Master class
+    #for k in all_kids:
+    #    for c in all_classes:
+    #        for s in all_slots:
+    #            if classInfo[c][2] == 
+    #            model.Add(sum(classAttendance[k,c,s] for s in all_slots) == 1)
+    #
 
     #One Class per time slot
     for k in all_kids:
