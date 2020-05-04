@@ -6,6 +6,8 @@ from mimetypes import guess_type
 from urllib.parse import unquote_plus, urlparse
 
 import json
+import os
+import re
 
 from csv import import_csv
 from gort.gort_types import *
@@ -198,6 +200,25 @@ class HTTP_Handler (BaseHTTPRequestHandler):
             # Validate the headers for CSV data
             if not self.validate_POST_headers('text/csv', 'base64'):
                 return
+
+            # Save webapp_root/previous.json if it exists
+            # Saved as *.1, *.2, etc with higher number meaning newer
+            base = 'previous.json'
+            if os.access(f'{self.webapp_root}/{base}', os.F_OK):
+                flatten = lambda z: [x for y in z for x in y]
+                # Get list of all the files in webapp_root
+                files = flatten([x for _, _, x in os.walk(self.webapp_root)])
+                # Get list of all backup JSON files
+                prevs = [x for x in files if re.match(f'{base}\.\d+', x)]
+                # Extract the extensions as a sorted list of ints
+                prevs = sorted([int(x.split('.')[2]) for x in prevs])
+                ext = 1
+                # If any backups exist, get the next one
+                if len(prevs):
+                    ext = prevs[-1] + 1
+                # Backup the JSON file
+                os.rename(f'{self.webapp_root}/{base}',
+                          f'{self.webapp_root}/{base}.{ext}')
 
             length = int(self.headers['content-length'])
             post_data = self.rfile.read(length)
