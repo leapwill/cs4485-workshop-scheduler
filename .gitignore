@@ -135,3 +135,6 @@ dmypy.json
 # Ignore previous.json and backups
 previous.json
 previous.json.*
+
+# Ignore .DS_Store files
+.DS_Store
