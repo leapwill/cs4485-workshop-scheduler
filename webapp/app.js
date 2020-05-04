@@ -115,20 +115,22 @@ let constraintComponent = new Vue({
         },
         submitCsv: function (e) {
             e.preventDefault();
-            const file = document.querySelector('form#form-csv input[type="file"]').files[0];
-            const reader = new FileReader();
-            // using ugly old syntax because FileReader is old and doesn't use Promises
-            reader.addEventListener('load', (e) => {
-                fetch('post_csv', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'text/csv', 'Content-Encoding': 'base64' },
-                    body: btoa(e.target.result)
-                }).then(response => {
-                    const statusEl = document.querySelector('form#form-csv div.form-status')
-                    this.setFormStatus(statusEl, response);
-                })
-            });
-            reader.readAsBinaryString(file);
+            if (confirm('Are you sure you want to upload new student data and reset the workshop?')) {
+                const file = document.querySelector('form#form-csv input[type="file"]').files[0];
+                const reader = new FileReader();
+                // using ugly old syntax because FileReader is old and doesn't use Promises
+                reader.addEventListener('load', (e) => {
+                    fetch('post_csv', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'text/csv', 'Content-Encoding': 'base64' },
+                        body: btoa(e.target.result)
+                    }).then(response => {
+                        const statusEl = document.querySelector('form#form-csv div.form-status')
+                        this.setFormStatus(statusEl, response);
+                    })
+                });
+                reader.readAsBinaryString(file);
+            }
         },
         submitConstraints: async function () {
             let response = await fetch('post_constraints', {
