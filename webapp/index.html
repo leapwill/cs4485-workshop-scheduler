@@ -221,7 +221,9 @@
     <div id="schedule-app" v-if="scheduleVisible">
       <back-button></back-button>
       <!-- TODO: have download button for final schedule produced by GORT -->
-      <div>Schedule is Visible</div>
+      <div>
+        <a href="/schedule.csv">Download Schedule CSV</a>
+      </div>
     </div>
   </div>
   <script src="app.js"></script>
